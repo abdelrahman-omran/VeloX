@@ -1,1 +1,16 @@
-# Agentic-Team-Lead-Assistant
+# Agentic Team Lead Assistant
+
+AI-powered decision support that connects GitHub delivery signals to Team Lead action — PR risk scoring, blast-radius hints, and mocked sprint-health visibility for a demo-first DevOps hackathon.
+
+## Planning docs
+
+Start here before writing code: **[docs/README.md](docs/README.md)**
+
+| Doc | Purpose |
+| --- | --- |
+| [PRD](docs/01-prd.md) | One-pager product agreement |
+| [Demo use case](docs/02-demo-use-case.md) | 3-minute pitch script (feature gate) |
+| [Architecture](docs/03-architecture.md) | Data flow + stack tradeoffs (Go / TS / Python TBD) |
+| [API contracts](docs/04-api-contracts/) | REST + LLM JSON schemas and examples |
+
+Shared product facts live in [`docs/_shared/product.yml`](docs/_shared/product.yml).

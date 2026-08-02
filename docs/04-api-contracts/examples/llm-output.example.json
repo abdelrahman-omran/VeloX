@@ -1,0 +1,6 @@
+{
+  "risk_score": 8,
+  "blast_radius_services": ["auth-service", "database-schema"],
+  "ai_summary": "Changes to user authentication tokens. Requires database rollback script.",
+  "recommended_reviewers": ["backend-lead"]
+}

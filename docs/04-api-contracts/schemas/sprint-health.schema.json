@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-team-lead-assistant.local/schemas/sprint-health.schema.json",
+  "title": "SprintHealth",
+  "description": "Mocked predictive delivery metrics for GET /api/sprint/health (V1).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "sprint_name",
+    "confidence_percent",
+    "trend",
+    "burndown",
+    "blockers",
+    "updated_at"
+  ],
+  "properties": {
+    "sprint_name": { "type": "string", "minLength": 1 },
+    "confidence_percent": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Mocked sprint completion confidence."
+    },
+    "trend": {
+      "type": "string",
+      "enum": ["up", "flat", "down"]
+    },
+    "burndown": {
+      "type": "array",
+      "description": "Points remaining (or work units) per day for a simple chart.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["day", "remaining"],
+        "properties": {
+          "day": { "type": "string", "description": "Label or ISO date." },
+          "remaining": { "type": "number", "minimum": 0 }
+        }
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "severity"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string" },
+          "severity": {
+            "type": "string",
+            "enum": ["low", "medium", "high"]
+          }
+        }
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "Optional demo copy for the panel."
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

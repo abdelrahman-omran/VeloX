@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-team-lead-assistant.local/schemas/scored-pr.schema.json",
+  "title": "ScoredPR",
+  "description": "PR metadata plus LLM scoring fields returned by GET /api/prs/active.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "number",
+    "title",
+    "author",
+    "html_url",
+    "status",
+    "risk_score",
+    "blast_radius_services",
+    "ai_summary",
+    "recommended_reviewers",
+    "updated_at"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Stable internal id (e.g. repo#number or UUID)."
+    },
+    "number": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "title": { "type": "string", "minLength": 1 },
+    "author": { "type": "string", "minLength": 1 },
+    "html_url": { "type": "string", "format": "uri" },
+    "repo_full_name": {
+      "type": "string",
+      "description": "owner/repo"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["scoring", "scored", "error"],
+      "description": "Pipeline state for the Glass."
+    },
+    "risk_score": {
+      "type": ["integer", "null"],
+      "minimum": 1,
+      "maximum": 10,
+      "description": "Null while status is scoring."
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": ["low", "medium", "high", "critical", "unknown"],
+      "description": "Derived badge for UI; optional if client derives from score."
+    },
+    "blast_radius_services": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "ai_summary": {
+      "type": ["string", "null"]
+    },
+    "recommended_reviewers": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "ci_status": {
+      "type": "string",
+      "enum": ["pending", "success", "failure", "unknown"]
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
