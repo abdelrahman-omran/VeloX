@@ -1,0 +1,318 @@
+# Exploration catalog — possible users & use cases (broader than V1).
+# Edit lists here; docs/00-exploration.md is the human-readable view.
+# V1 primary audience remains product.yml → target_audience (Team Lead / EM).
+
+status: exploration
+note: >
+  Not a commitment to build. Cross-check any promoted idea against
+  product.yml in_scope / out_scope and the demo script before coding.
+
+personas:
+  - id: eng_manager
+    name: Engineering Manager
+    aliases: [EM, people manager]
+    primary_jobs:
+      - Delivery visibility across people and streams
+      - Capacity and risk conversations with stakeholders
+    pains:
+      - Status from meetings is stale
+      - Hard to see who is overloaded or blocked
+
+  - id: team_lead
+    name: Team Lead
+    aliases: [tech-oriented lead, squad lead]
+    primary_jobs:
+      - Daily triage of PRs and delivery risks
+      - Route reviews and unblock the team
+    pains:
+      - Manual PR risk analysis
+      - Review bottlenecks
+
+  - id: tech_lead
+    name: Tech Lead / Staff Engineer
+    aliases: [TL, staff+, principal IC]
+    primary_jobs:
+      - Guard architecture and critical paths
+      - Mentor reviews on high-impact changes
+    pains:
+      - Missed blast radius on cross-service PRs
+      - Review time spent on low-signal diffs
+
+  - id: developer
+    name: Developer / Individual Contributor
+    aliases: [IC, engineer]
+    primary_jobs:
+      - Ship changes safely and get timely reviews
+      - Understand impact of their own PRs
+    pains:
+      - Unclear who should review
+      - Surprises after merge (failures, hotspots)
+
+  - id: scrum_master
+    name: Scrum Master / Agile Facilitator
+    aliases: [SM, agile coach]
+    primary_jobs:
+      - Protect sprint goals and surface impediments
+      - Facilitate planning and retros with evidence
+    pains:
+      - Burndown disconnected from real engineering signal
+      - Blockers discovered late in the sprint
+
+  - id: product_manager
+    name: Product Manager
+    aliases: [PM]
+    primary_jobs:
+      - Align roadmap commits with delivery reality
+      - Communicate milestone risk to business
+    pains:
+      - Gap between Jira/status and GitHub progress
+      - Late notice that a feature will slip
+
+  - id: qa_engineer
+    name: QA / SDET
+    aliases: [QA, test engineer]
+    primary_jobs:
+      - Focus test effort on high-risk changes
+      - Gate releases with evidence
+    pains:
+      - Unclear which PRs need deep regression
+      - CI signal without change-risk context
+
+  - id: devops_platform
+    name: DevOps / Platform Engineer
+    aliases: [platform, CI owner]
+    primary_jobs:
+      - Keep pipelines healthy and actionable
+      - Reduce flaky/noise impact on delivery
+    pains:
+      - PR risk ignored when CI is green but change is dangerous
+      - Hard to correlate pipeline failures with blast radius
+
+  - id: sre_oncall
+    name: SRE / On-call Engineer
+    aliases: [SRE, on-call]
+    primary_jobs:
+      - Reduce incident risk from risky merges
+      - Know what landed before a page
+    pains:
+      - Recent high-blast merges are hard to find under pressure
+      - Weak link from change → services → ownership
+
+  - id: security_engineer
+    name: Security Engineer
+    aliases: [AppSec, security champion]
+    primary_jobs:
+      - Catch sensitive-path changes early
+      - Prioritize security review capacity
+    pains:
+      - Auth/secrets/PII paths buried in large PR queues
+      - Reviewer routing ignores security ownership
+
+  - id: release_manager
+    name: Release Manager
+    aliases: [release owner]
+    primary_jobs:
+      - Decide go/no-go with change risk in view
+      - Coordinate hotfixes and rollback readiness
+    pains:
+      - Release trains include opaque high-risk PRs
+      - Incomplete picture of open risky work
+
+  - id: engineering_director
+    name: Engineering Director / Head of Eng
+    aliases: [director, VP Eng lightweight view]
+    primary_jobs:
+      - Portfolio health across teams
+      - Spot systemic review or delivery anti-patterns
+    pains:
+      - Dashboards are vanity or week-old
+      - No consistent risk language across squads
+
+  - id: architect
+    name: Software Architect
+    aliases: [architecture owner]
+    primary_jobs:
+      - Protect domain boundaries and critical services
+      - Review cross-cutting changes
+    pains:
+      - Service maps not tied to live PR activity
+      - Late discovery of schema/API contract breaks
+
+# Use cases: id, title, actors (persona ids), goal, trigger, outcome, horizon
+# horizon: v1_demo | v2 | future — guidance only, not a roadmap commitment
+use_cases:
+  - id: uc_triage_risky_prs
+    title: Triage the active PR queue by risk
+    actors: [team_lead, eng_manager, tech_lead]
+    trigger: New PRs open or CI completes
+    goal: See which PRs need attention first
+    outcome: Prioritized queue with risk badges and summaries
+    horizon: v1_demo
+
+  - id: uc_blast_radius_before_merge
+    title: Estimate blast radius before merge
+    actors: [team_lead, tech_lead, architect, developer, qa_engineer]
+    trigger: PR touches shared or critical paths
+    goal: Know which services/areas are impacted
+    outcome: Blast-radius list and extra-review/testing hints
+    horizon: v1_demo
+
+  - id: uc_recommend_reviewers
+    title: Recommend suitable reviewers
+    actors: [team_lead, developer, tech_lead]
+    trigger: PR needs review assignment
+    goal: Route to people with relevant expertise
+    outcome: Suggested reviewers; optional assign action
+    horizon: v1_demo
+
+  - id: uc_ai_pr_summary
+    title: Get an AI summary of a PR's intent and risk
+    actors: [team_lead, developer, eng_manager, security_engineer]
+    trigger: Opening or reviewing a PR in the product
+    goal: Understand change without reading every file first
+    outcome: Short AI summary suitable for standup or GitHub comment
+    horizon: v1_demo
+
+  - id: uc_mock_sprint_confidence
+    title: View sprint confidence and blockers (mocked)
+    actors: [team_lead, scrum_master, eng_manager, product_manager]
+    trigger: Daily check-in or demo
+    goal: Sense delivery risk vs sprint goal
+    outcome: Confidence %, trend, burndown sketch, blocker list
+    horizon: v1_demo
+
+  - id: uc_github_risk_comment
+    title: Post risk/blast-radius comment on GitHub
+    actors: [team_lead, developer]
+    trigger: High-risk PR scored
+    goal: Keep context where engineers already work
+    outcome: Bot/agent comment on the PR
+    horizon: v1_demo
+
+  - id: uc_developer_self_check
+    title: Author self-checks risk before requesting review
+    actors: [developer]
+    trigger: PR opened or updated
+    goal: Fix obvious risk/test gaps before pinging seniors
+    outcome: Author sees score, blast radius, suggested reviewers
+    horizon: v2
+
+  - id: uc_focus_qa_on_hotspots
+    title: Focus QA on high-risk and high-blast PRs
+    actors: [qa_engineer, team_lead]
+    trigger: Test planning for a sprint or release
+    goal: Allocate deep regression where it matters
+    outcome: Ordered list of PRs/services needing extra tests
+    horizon: v2
+
+  - id: uc_security_sensitive_paths
+    title: Flag security-sensitive path changes
+    actors: [security_engineer, tech_lead, team_lead]
+    trigger: PR touches auth, secrets, PII, IAM, crypto
+    goal: Ensure AppSec or champions are in the loop
+    outcome: Elevated risk + security reviewer recommendation
+    horizon: v2
+
+  - id: uc_scrum_impediment_radar
+    title: Surface engineering impediments for the Scrum Master
+    actors: [scrum_master, team_lead]
+    trigger: Mid-sprint health check
+    goal: Bring evidence to standups/retros (stuck PRs, CI fail loops)
+    outcome: Blocker feed tied to real PR/CI signals
+    horizon: v2
+
+  - id: uc_pm_milestone_risk
+    title: Translate engineering risk into milestone language
+    actors: [product_manager, eng_manager, engineering_director]
+    trigger: Stakeholder update or planning
+    goal: Explain slip risk without raw GitHub jargon
+    outcome: Plain-language delivery risk + linked high-risk work
+    horizon: v2
+
+  - id: uc_jira_alignment
+    title: Align issue tracker status with GitHub progress
+    actors: [product_manager, scrum_master, eng_manager]
+    trigger: Sprint review or status report
+    goal: Close the eng↔business workflow gap
+    outcome: Linked PR/issue view; drift alerts (ticket Done vs PR open)
+    horizon: v2
+
+  - id: uc_workload_overload
+    title: Detect overloaded reviewers or authors
+    actors: [eng_manager, team_lead, scrum_master]
+    trigger: Review queue grows; sprint mid-point
+    goal: Rebalance work before burnout or stall
+    outcome: Load signals per person; reassignment suggestions
+    horizon: v2
+
+  - id: uc_real_delivery_forecast
+    title: Predict sprint/release completion confidence (real model)
+    actors: [eng_manager, scrum_master, product_manager, release_manager]
+    trigger: Planning or go/no-go
+    goal: Proactive delay detection from history + current load
+    outcome: Forecast with drivers (not only mocked UI)
+    horizon: future
+
+  - id: uc_tech_debt_radar
+    title: Identify accumulating technical debt hotspots
+    actors: [tech_lead, architect, eng_manager]
+    trigger: Retro or quarterly planning
+    goal: Spot debt that threatens upcoming delivery
+    outcome: Hotspot report + suggested follow-up work
+    horizon: future
+
+  - id: uc_release_go_nogo
+    title: Release go/no-go with open risk inventory
+    actors: [release_manager, eng_manager, sre_oncall, qa_engineer]
+    trigger: Release train cutoff
+    goal: Decide with visibility into unscored/high-risk open PRs
+    outcome: Go/no-go checklist fed by scored changes
+    horizon: future
+
+  - id: uc_incident_change_context
+    title: Pull recent high-blast changes during an incident
+    actors: [sre_oncall, tech_lead, devops_platform]
+    trigger: Page / incident declared
+    goal: Candidate changes for rollback or bisect
+    outcome: Timeline of risky merges touching affected services
+    horizon: future
+
+  - id: uc_ci_noise_vs_risk
+    title: Separate CI flakiness from true change risk
+    actors: [devops_platform, team_lead, developer]
+    trigger: Red checks on a PR
+    goal: Know whether to re-run, fix tests, or treat as risk signal
+    outcome: Annotated CI status with risk context
+    horizon: future
+
+  - id: uc_cross_team_portfolio
+    title: Portfolio risk view across multiple teams
+    actors: [engineering_director, eng_manager]
+    trigger: Weekly eng leadership review
+    goal: Compare delivery risk patterns across squads
+    outcome: Multi-team dashboard with shared risk language
+    horizon: future
+
+  - id: uc_architecture_boundary_guard
+    title: Guard architecture boundaries on cross-cutting PRs
+    actors: [architect, tech_lead]
+    trigger: PR spans services or shared libraries
+    goal: Enforce review from architecture owners
+    outcome: Boundary violation flags + required reviewers
+    horizon: future
+
+  - id: uc_onboarding_review_norms
+    title: Help new engineers learn review norms via AI guidance
+    actors: [developer, tech_lead]
+    trigger: First PRs on a new codebase
+    goal: Faster safe contribution
+    outcome: Explanations of why risk was raised; links to owned services
+    horizon: future
+
+  - id: uc_custom_policy_rules
+    title: Encode team policies into scoring (e.g. migrations need DBA)
+    actors: [team_lead, architect, security_engineer, devops_platform]
+    trigger: Org-specific compliance or review rules
+    goal: Automate routing beyond generic LLM heuristics
+    outcome: Policy-driven risk boosts and reviewer rules
+    horizon: future

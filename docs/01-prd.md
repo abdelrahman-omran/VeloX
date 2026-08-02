@@ -98,6 +98,7 @@ Canonical list: `out_scope` in [`product.yml`](_shared/product.yml). Summary:
 
 | Doc | Role |
 | --- | --- |
+| [Exploration](00-exploration.md) | Broader users/use cases (do not treat as V1 scope) |
 | [Demo use case](02-demo-use-case.md) | Feature gate for every build decision |
 | [Architecture](03-architecture.md) | Boxes, arrows, stack TBD |
 | [API contracts](04-api-contracts/) | JSON shapes between LLM, backend, and UI |
