@@ -1,0 +1,66 @@
+# Single source of truth for product facts.
+# Edit this file first; PRD / demo / architecture reference it.
+
+name: Agentic Team Lead Assistant
+slug: agentic-team-lead-assistant
+tagline: AI-powered decision support that connects GitHub delivery signals to Team Lead action.
+
+elevator_pitch: >
+  An AI decision-support agent that turns fragmented GitHub and CI/CD activity into
+  real-time delivery visibility for Team Leads. It scores pull-request risk, estimates
+  blast radius, and surfaces mocked sprint-health signals so leaders act before deadlines slip.
+
+target_audience: >
+  Engineering Team Leads and Managers overseeing ~5–15 developers who are bottlenecked
+  by manual PR triage, stale status meetings, and disconnected engineering vs. planning tools.
+
+success_metrics:
+  - Working GitHub webhook that ingests PR events from a demo repo on stage
+  - LLM returns valid scored JSON for at least 5 dummy PRs without schema failures
+  - React dashboard shows live PR risk queue plus mocked sprint confidence
+  - End-to-end demo path (open risky PR → high-risk badge → recommended reviewer) completes in under 3 minutes
+
+demo_modules:
+  - id: pr_intelligence
+    name: AI-Powered Pull Request Intelligence
+    note: Risk score, summary, recommended reviewers from PR + CI context
+  - id: blast_radius
+    name: Engineering Impact & Blast Radius Analysis
+    note: Map changed files/services; highlight critical paths needing extra review
+  - id: predictive_delivery
+    name: Predictive Delivery Intelligence
+    note: Mocked sprint confidence, burndown, and blockers in the UI (not real forecasting in V1)
+
+integrations:
+  v1:
+    - GitHub webhooks (pull_request, check_suite / workflow as available)
+  v2:
+    - Jira / issue trackers
+    - Deeper CI vendor adapters
+    - Postgres and multi-team tenancy
+
+in_scope:
+  - GitHub webhook ingestion and signature verification
+  - LLM prompt that returns strict JSON risk scoring (OpenAI-compatible API)
+  - Blast-radius service hints derived from changed paths + LLM
+  - React dashboard: active PR queue, risk badges, AI summary, recommended reviewers
+  - Mocked sprint health / confidence panel for the demo
+  - Lightweight persistence of PR metadata and AI scores (SQLite)
+
+out_scope:
+  - Custom trained ML models
+  - Jira or other PM-tool integration
+  - Real predictive analytics / forecasting models (mock metrics in UI only)
+  - Multi-org SaaS auth, billing, or RBAC beyond a simple demo mode
+  - Production-grade HA, multi-region, or formal compliance controls
+
+defaults:
+  llm: openai_compatible  # OpenAI, Gemini (OpenAI-compat), or local via LLM_BASE_URL
+  storage: sqlite         # Postgres optional later / Docker
+  frontend: react_typescript
+  backend_stack: TBD      # See docs/03-architecture.md tradeoffs
+
+assumptions:
+  - 3-week hackathon; demo-first scoping
+  - One dummy GitHub repo and fixture PRs are enough for judging
+  - Stack choice (Go / TypeScript / Python) is decided before Day 1 coding

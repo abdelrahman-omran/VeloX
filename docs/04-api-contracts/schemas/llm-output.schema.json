@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-team-lead-assistant.local/schemas/llm-output.schema.json",
+  "title": "LLMOutput",
+  "description": "Strict JSON the LLM must return for PR risk scoring (Contract A).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "risk_score",
+    "blast_radius_services",
+    "ai_summary",
+    "recommended_reviewers"
+  ],
+  "properties": {
+    "risk_score": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10,
+      "description": "1 = low risk, 10 = critical."
+    },
+    "blast_radius_services": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Logical services or areas impacted by the change."
+    },
+    "ai_summary": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Short human-readable explanation of risk and impact."
+    },
+    "recommended_reviewers": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Handles or role ids suggested for review."
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "sprint_name": "Sprint 18 — Payments hardening",
+  "confidence_percent": 62,
+  "trend": "down",
+  "burndown": [
+    { "day": "Mon", "remaining": 40 },
+    { "day": "Tue", "remaining": 36 },
+    { "day": "Wed", "remaining": 34 },
+    { "day": "Thu", "remaining": 33 },
+    { "day": "Fri", "remaining": 31 }
+  ],
+  "blockers": [
+    {
+      "id": "blk-1",
+      "label": "High-risk auth PR waiting on senior review",
+      "severity": "high"
+    },
+    {
+      "id": "blk-2",
+      "label": "CI flaky on integration suite",
+      "severity": "medium"
+    }
+  ],
+  "notes": "Mocked for demo — not a live forecast.",
+  "updated_at": "2026-08-02T12:00:00Z"
+}
