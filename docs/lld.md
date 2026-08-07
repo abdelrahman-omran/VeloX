@@ -1,6 +1,6 @@
 # Agentic Team Lead Assistant — Low-Level Design
 
-> **Stack:** Python (FastAPI) · ARQ · SQLite · Redis · React  
+> **Stack:** Python (FastAPI) · ARQ · PostgreSQL · Redis · React  
 > **Architecture:** Modular Monolith (single deployable, clean domain boundaries)  
 > **Date:** 2026-08-04
 
@@ -12,7 +12,7 @@ Agentic Team Lead Assistant is a single-backend application that acts as an AI-p
 
 **Key decisions:**
 - **ARQ** for background jobs — asyncio-native, typed, minimal ops.
-- **SQLite** kept for persistence — WAL mode + busy-timeout make it viable for modest worker concurrency.
+- **PostgreSQL** kept for persistence — MVCC (Multi-Version Concurrency Control) + busy-timeout make it viable for modest worker concurrency.
 - **Redis** required by ARQ for the job queue only.
 - **Agentic architecture** — `orchestrator` coordinates specialized agents (`prioritization`, `blast_radius`, `sprint_forecast`).
 - **Modular monolith** — domains are separate modules with zero cross-imports.
@@ -28,7 +28,7 @@ agentic-team-lead/
 │   │   ├── __init__.py
 │   │   ├── main.py                      # FastAPI factory, router mount, lifespan
 │   │   ├── config.py                    # Pydantic Settings (env-only, no secrets baked)
-│   │   ├── database.py                  # SQLAlchemy engine + session (SQLite, WAL)
+│   │   ├── database.py                  # SQLAlchemy engine + session (PostgreSQL, MVCC)
 │   │   ├── dependencies.py              # FastAPI Depends: DB, Redis, HTTP clients
 │   │   │
 │   │   ├── common/                      # Shared kernel (both modules may read, neither owns)
@@ -119,9 +119,9 @@ agentic-team-lead/
 
 | File | Responsibility |
 |------|----------------|
-| `main.py` | FastAPI app factory. Mounts routers under `/api/*`. Starts ARQ Redis pool in lifespan. Creates SQLite tables on startup. |
+| `main.py` | FastAPI app factory. Mounts routers under `/api/*`. Starts ARQ Redis pool in lifespan. Creates PostgreSQL tables on startup. |
 | `config.py` | `Pydantic Settings` class. Reads `GITHUB_WEBHOOK_SECRET`, `LLM_API_KEY`, `DATABASE_URL`, `REDIS_URL`, etc. from env. Fails fast on boot if required vars missing. |
-| `database.py` | SQLAlchemy `create_engine` + `sessionmaker`. SQLite with `check_same_thread=False`, `poolclass=NullPool` for workers, `PRAGMA journal_mode=WAL`. |
+| `database.py` | SQLAlchemy `create_engine` + `sessionmaker`. PostgreSQL with `pool_size=10, max_overflow=20`, `poolclass=AsyncAdaptedQueuePool` for workers, `PRAGMA isolation_level=READ_COMMITTED`. |
 | `dependencies.py` | FastAPI `Depends()` providers: `get_db()` (Session), `get_redis_pool()` (ARQ), `get_http_client()` (httpx.AsyncClient singleton). |
 
 ### Common (Shared Kernel)
@@ -147,7 +147,7 @@ agentic-team-lead/
 | `core/prioritization/service.py` | `score_pr(db, pr_id, owner, repo, number)`. Orchestrates: fetch diff → delegate to `ai.orchestrator` → persist results. Thin wrapper around the agentic layer. |
 | `core/prioritization/github_client.py` | `verify_signature(body, sig, secret)` (HMAC-SHA256). `fetch_diff(owner, repo, number, token)` via GitHub REST API. |
 | `core/blast_radius/service.py` | `analyze_pr(db, pr_id)`. Reads cached diff → delegates to `ai.orchestrator` → writes `blast_reports`, updates `PR.status`. |
-| `core/blast_radius/code_parser.py` | Extracts changed files, imports, and module boundaries from raw diff text. Language-agnostic regex + optional AST. |
+| `core/blast_radius/code_parser.py` | Preprocesses GitHub diff data into a structured format for the Blast Radius Agent. Initial implementation relies on LLM reasoning, with optional AST-based parsing planned for future iterations. |
 | `core/blast_radius/impact_graph.py` | Calculates downstream reach: "files importing changed modules". Computes `impact_score` (0-100) and `risk_level`. |
 
 ### Agentic Layer (Core / AI)
@@ -251,7 +251,7 @@ This project follows a combination of architectural patterns and software design
                           │
            ┌──────────────┴──────────────┐
            │  common/models.py (PR)      │
-           │  database.py (SQLite)       │
+           │  database.py (PostgreSQL)       │
            └─────────────────────────────┘
 ```
 
@@ -508,138 +508,33 @@ Frontend
 │  3. Return SprintHealthResult       │
 └─────────────────────────────────────┘
 ```
-
 ---
 
-## 9. Docker Architecture
+## 9. PostgreSQL + Workers: Mitigation Strategy
 
-### `backend/Dockerfile`
-
-```dockerfile
-FROM python:3.12-slim
-
-WORKDIR /app
-RUN apt-get update && apt-get install -y --no-install-recommends gcc     && rm -rf /var/lib/apt/lists/*
-
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . .
-RUN mkdir -p /app/data
-
-EXPOSE 8000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-```
-
-### `frontend/Dockerfile`
-
-```dockerfile
-# Build
-FROM node:20-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-# Serve
-FROM nginx:alpine
-COPY --from=builder /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
-```
-
-### `docker-compose.yml`
-
-```yaml
-version: "3.8"
-
-services:
-  redis:
-    image: redis:7-alpine
-    restart: unless-stopped
-
-  api:
-    build: ./backend
-    ports:
-      - "8000:8000"
-    env_file: .env
-    volumes:
-      - sqlite_data:/app/data
-    depends_on:
-      - redis
-    restart: unless-stopped
-
-  worker:
-    build: ./backend
-    command: arq app.worker.WorkerSettings
-    env_file: .env
-    volumes:
-      - sqlite_data:/app/data
-    depends_on:
-      - redis
-    restart: unless-stopped
-    deploy:
-      replicas: 2
-
-  frontend:
-    build: ./frontend
-    ports:
-      - "80:80"
-    depends_on:
-      - api
-    restart: unless-stopped
-
-volumes:
-  sqlite_data:
-```
-
-### `docker-compose.override.yml` (Dev)
-
-```yaml
-version: "3.8"
-
-services:
-  api:
-    volumes:
-      - ./backend:/app
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-
-  worker:
-    volumes:
-      - ./backend:/app
-    command: arq app.worker.WorkerSettings
-    deploy:
-      replicas: 1
-```
-
----
-
-## 10. SQLite + Workers: Mitigation Strategy
-
-SQLite is single-writer. ARQ workers run in separate processes. This is the architecture's primary constraint.
+PostgreSQL handles concurrent writers. ARQ workers run in separate processes. This is the architecture's primary constraint.
 
 ### Mitigations Applied
 
 | Technique | Where | Effect |
 |-----------|-------|--------|
-| **WAL mode** | `database.py` — `PRAGMA journal_mode=WAL` | Readers do not block writers. Writers do not block readers. |
-| **Busy timeout** | `database.py` — `PRAGMA busy_timeout=5000` | Writer waits up to 5s instead of failing with "database is locked". |
-| **NullPool for workers** | `database.py` — `poolclass=NullPool` in worker context | Each job opens a fresh connection. No stale pooled connections across processes. |
-| **Low worker concurrency** | `WorkerSettings.max_jobs = 5` | Limits simultaneous writers. Scale horizontally (more worker containers) only if SQLite contention is acceptable. |
-| **Claim Check pattern** | ARQ queue carries only `pr_id` | Queue is tiny. Heavy writes (diff cache, scores) happen in SQLite, not Redis. |
+| **MVCC (Multi-Version Concurrency Control)** | `database.py` — `PRAGMA isolation_level=READ_COMMITTED` | Readers do not block writers. Writers do not block readers. |
+| **Busy timeout** | `database.py` — `PRAGMA busy_timeout=5000` | Writer waits up to 5s instead of failing with "connection pool exhausted". |
+| **connection pool for workers** | `database.py` — `poolclass=AsyncAdaptedQueuePool` in worker context | Each job opens a pooled connection. No connection leaks across processes. |
+| **Low worker concurrency** | `WorkerSettings.max_jobs = 5` | Limits simultaneous writers. Scale horizontally (more worker containers) only if PostgreSQL contention is acceptable. |
+| **Claim Check pattern** | ARQ queue carries only `pr_id` | Queue is tiny. Heavy writes (diff cache, scores) happen in PostgreSQL, not Redis. |
 | **Idempotency** | Workers skip if `PR.status` already terminal | Duplicate or retried jobs do not re-write. |
 
 ### When to Migrate
 
-If you observe `database is locked` errors under load, the path forward is:
-1. Replace SQLite with PostgreSQL (`database.py` engine swap).
+If you observe `connection pool exhausted` errors under load, the path forward is:
+1. Increase PostgreSQL connection pool size in `database.py`.
 2. Increase `max_jobs` and worker replicas.
 3. No changes needed in `core/`, `api/`, `ai/`, or `workers/`.
 
 ---
 
-## 11. API Reference
+## 10. API Reference
 
 ### Webhooks
 
@@ -671,7 +566,7 @@ If you observe `database is locked` errors under load, the path forward is:
 
 ---
 
-## 12. Environment Variables
+## 11. Environment Variables
 
 ```bash
 # GitHub
@@ -684,7 +579,7 @@ LLM_BASE_URL=https://api.openai.com/v1
 LLM_MODEL=gpt-4o-mini
 
 # Database
-DATABASE_URL=sqlite:////app/data/agentic_team_lead.db
+DATABASE_URL=postgresql+asyncpg://user:pass@postgres:5432/agentic_team_lead
 
 # Redis (ARQ)
 REDIS_URL=redis://redis:6379
@@ -695,26 +590,26 @@ PORT=8000
 
 ---
 
-## 13. Failure Handling
+## 12. Failure Handling
 
 | Risk | Symptom | Mitigation |
 |------|---------|------------|
 | Bad webhook secret | Events ignored | `github_client.verify_signature()` → 401. Log raw body for debugging. |
 | LLM timeout / rate limit | PR stuck `pending` | ARQ `max_tries=3`, `retry_delay=30`. Worker marks `error` after exhaustion. |
 | LLM schema drift | UI breaks / parse errors | `response_validator` validates with Pydantic. Rejects bad JSON → `error` status. |
-| SQLite locked | `database is locked` | WAL + busy_timeout + low concurrency. Monitor logs; migrate to Postgres if persistent. |
+| Connection pool exhausted | `connection pool exhausted` | Connection pooling + MVCC. Monitor logs; increase pool size or add PgBouncer if persistent. |
 | Worker crash mid-job | Job lost in Redis | ARQ retries on next worker start (unacked message). Idempotency prevents double-write. |
 | Tunnel / network drop | No live webhook | `POST /webhooks/github` accepts manual replay. Fixtures in `tests/fixtures/` for local dev. |
 
 ---
 
-## 14. Related Decisions
+## 13. Related Decisions
 
 | Decision | Rationale |
 |----------|-----------|
 | **ARQ over Celery** | Asyncio-native, typed, minimal ops. No `kombu`/`billiard` complexity. |
-| **SQLite kept** | Zero infra for demo. WAL mode makes it viable for low-concurrency workers. Migration path to Postgres is one engine swap. |
+| **PostgreSQL kept** | Zero infra for demo. MVCC (Multi-Version Concurrency Control) makes it viable for low-concurrency workers. Migration path to Postgres is one engine swap. |
 | **Modular monolith** | Clean boundaries without microservices overhead. Can extract to services later if needed. |
 | **Redis only for queue** | Not used for caching or state. Keeps architecture simple. |
-| **Claim Check** | ARQ messages carry `pr_id` only. Large payloads (diffs) live in SQLite. |
+| **Claim Check** | ARQ messages carry `pr_id` only. Large payloads (diffs) live in PostgreSQL. |
 | **Agentic architecture** | `orchestrator` + specialized agents mirrors a real team lead structure. New agents (security, review, docs) can be added without touching existing services. |
