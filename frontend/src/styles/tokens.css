@@ -1,0 +1,22 @@
+/**
+ * VeloX design tokens — chill production dark palette (GitHub/Linear/Grafana-adjacent).
+ */
+
+:root {
+  --velox-bg: #0b0e14;
+  --velox-card: #131820;
+  --velox-elevated: #1a212c;
+  --velox-border: #243041;
+  --velox-text: #e8eef6;
+  --velox-muted: #8b97a8;
+  --velox-brand: #4c8bf5;
+  --velox-brand-hover: #6ba0f7;
+  --velox-brand-soft: rgba(76, 139, 245, 0.12);
+  --velox-low: #3d9b74;
+  --velox-med: #d19a26;
+  --velox-high: #e24b4a;
+
+  color-scheme: dark;
+  background-color: var(--velox-bg);
+  color: var(--velox-text);
+}

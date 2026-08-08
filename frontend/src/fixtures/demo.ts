@@ -1,0 +1,98 @@
+import type { ScoredPr, SprintHealth } from '../schemas';
+
+/** Demo fixture queue — includes the high-risk auth PR from API contracts. */
+export const fixturePrs: ScoredPr[] = [
+  {
+    id: 'acme-payments#42',
+    number: 42,
+    title: 'Rotate auth token signing and migrate sessions table',
+    author: 'dev-alice',
+    html_url: 'https://github.com/example/acme-payments/pull/42',
+    repo_full_name: 'example/acme-payments',
+    status: 'scored',
+    risk_score: 8,
+    risk_level: 'high',
+    blast_radius_services: ['auth-service', 'database-schema'],
+    ai_summary:
+      'PR touches auth token refresh (micro) → blast radius includes auth-service and database-schema → elevates delivery risk for the current sprint (macro). Prefer a backend owner review before merge.',
+    recommended_reviewers: ['backend-lead'],
+    ci_status: 'pending',
+    updated_at: '2026-08-02T12:00:00Z',
+  },
+  {
+    id: 'acme-payments#41',
+    number: 41,
+    title: 'Add retry backoff to payments webhook consumer',
+    author: 'dev-bob',
+    html_url: 'https://github.com/example/acme-payments/pull/41',
+    repo_full_name: 'example/acme-payments',
+    status: 'scored',
+    risk_score: 5,
+    risk_level: 'medium',
+    blast_radius_services: ['payments-worker'],
+    ai_summary:
+      'Changes retry policy on the webhook consumer. Moderate ops impact if misconfigured; limited surface outside payments-worker.',
+    recommended_reviewers: ['payments-owner'],
+    ci_status: 'success',
+    updated_at: '2026-08-02T11:20:00Z',
+  },
+  {
+    id: 'acme-payments#40',
+    number: 40,
+    title: 'Docs: clarify local webhook tunnel setup',
+    author: 'dev-carol',
+    html_url: 'https://github.com/example/acme-payments/pull/40',
+    repo_full_name: 'example/acme-payments',
+    status: 'scored',
+    risk_score: 2,
+    risk_level: 'low',
+    blast_radius_services: [],
+    ai_summary: 'Documentation-only change. No runtime blast radius.',
+    recommended_reviewers: ['tech-writer'],
+    ci_status: 'success',
+    updated_at: '2026-08-02T10:05:00Z',
+  },
+  {
+    id: 'acme-payments#43',
+    number: 43,
+    title: 'Refactor invoice PDF renderer',
+    author: 'dev-dana',
+    html_url: 'https://github.com/example/acme-payments/pull/43',
+    repo_full_name: 'example/acme-payments',
+    status: 'scoring',
+    risk_score: null,
+    risk_level: 'unknown',
+    blast_radius_services: [],
+    ai_summary: null,
+    recommended_reviewers: [],
+    ci_status: 'pending',
+    updated_at: '2026-08-02T12:05:00Z',
+  },
+];
+
+export const fixtureSprintHealth: SprintHealth = {
+  sprint_name: 'Sprint 18 — Payments hardening',
+  confidence_percent: 62,
+  trend: 'down',
+  burndown: [
+    { day: 'Mon', remaining: 40 },
+    { day: 'Tue', remaining: 36 },
+    { day: 'Wed', remaining: 34 },
+    { day: 'Thu', remaining: 33 },
+    { day: 'Fri', remaining: 31 },
+  ],
+  blockers: [
+    {
+      id: 'blk-1',
+      label: 'High-risk auth PR waiting on senior review',
+      severity: 'high',
+    },
+    {
+      id: 'blk-2',
+      label: 'CI flaky on integration suite',
+      severity: 'medium',
+    },
+  ],
+  notes: 'Mocked for demo — not a live forecast.',
+  updated_at: '2026-08-02T12:00:00Z',
+};

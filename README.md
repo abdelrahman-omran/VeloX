@@ -20,3 +20,11 @@ Start here before writing code: **[docs/README.md](docs/README.md)**
 Shared product facts: [`docs/_shared/product.yml`](docs/_shared/product.yml).  
 Broader persona/use-case catalog: [`docs/_shared/exploration.yml`](docs/_shared/exploration.yml).  
 Drop-in tokens & logo: [`docs/brand/`](docs/brand/).
+
+## Glass frontend
+
+React triage dashboard lives in [`frontend/`](frontend/). Day-1 fixtures are on by default:
+
+```bash
+cd frontend && npm install && npm run dev
+```

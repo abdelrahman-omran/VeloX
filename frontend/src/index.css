@@ -1,0 +1,103 @@
+@import 'tailwindcss';
+@import './styles/tokens.css';
+
+@font-face {
+  font-family: 'Geist';
+  src: url('./assets/fonts/Geist-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --color-velox-bg: #0b0e14;
+  --color-velox-card: #131820;
+  --color-velox-elevated: #1a212c;
+  --color-velox-border: #243041;
+  --color-velox-text: #e8eef6;
+  --color-velox-muted: #8b97a8;
+  --color-velox-brand: #4c8bf5;
+  --color-velox-hover: #6ba0f7;
+  --color-velox-soft: rgba(76, 139, 245, 0.12);
+  --color-velox-low: #3d9b74;
+  --color-velox-med: #d19a26;
+  --color-velox-high: #e24b4a;
+  --font-sans: 'Geist', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  background-color: var(--velox-bg);
+  color: var(--velox-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:focus-visible {
+  outline: 2px solid var(--velox-brand);
+  outline-offset: 2px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes row-highlight {
+  0% {
+    background-color: rgba(226, 75, 74, 0.18);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--velox-elevated) 0%,
+    var(--velox-border) 50%,
+    var(--velox-elevated) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.animate-toast-in {
+  animation: toast-in 200ms ease-out;
+}
+
+.animate-row-highlight {
+  animation: row-highlight 1.6s ease-out;
+}
