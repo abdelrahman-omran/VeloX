@@ -5,7 +5,7 @@
 
 | Field | Value |
 | --- | --- |
-| Product | Agentic Team Lead Assistant |
+| Product | Mergent |
 | Horizon | 3-week hackathon (demo-first) |
 | Status | Draft — pre-code |
 
@@ -13,7 +13,7 @@
 
 ## Elevator Pitch
 
-An AI decision-support agent that turns fragmented GitHub and CI/CD activity into real-time delivery visibility for Team Leads. It scores pull-request risk, estimates blast radius, and surfaces mocked sprint-health signals so leaders act before deadlines slip.
+Mergent is an AI decision-support agent that turns fragmented GitHub and CI/CD activity into real-time delivery visibility for Team Leads. It scores pull-request risk, estimates blast radius, and surfaces mocked sprint-health signals so leaders act before deadlines slip.
 
 *(Canonical text: `elevator_pitch` in [`product.yml`](_shared/product.yml).)*
 
