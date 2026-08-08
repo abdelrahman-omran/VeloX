@@ -16,6 +16,7 @@ Start here before writing code: **[docs/README.md](docs/README.md)**
 | [API contracts](docs/04-api-contracts/) | REST + LLM JSON schemas and examples |
 | [Brand](docs/05-brand.md) | Identity, color tokens, typography, logo, dashboard theme |
 | [Competitors](docs/06-competitors.md) | Market gap, matrix, objections, focus tips |
+| [Frontend pages](docs/07-frontend-pages.md) | Glass routes: triage, link project, projects |
 
 Shared product facts: [`docs/_shared/product.yml`](docs/_shared/product.yml).  
 Broader persona/use-case catalog: [`docs/_shared/exploration.yml`](docs/_shared/exploration.yml).  
@@ -23,8 +24,10 @@ Drop-in tokens & logo: [`docs/brand/`](docs/brand/).
 
 ## Glass frontend
 
-React triage dashboard lives in [`frontend/`](frontend/). Day-1 fixtures are on by default:
+React triage dashboard lives in [`frontend/`](frontend/). Routes: see [`docs/07-frontend-pages.md`](docs/07-frontend-pages.md). Day-1 fixtures are on by default:
 
 ```bash
 cd frontend && npm install && npm run dev
 ```
+
+First visit: **Link a project** (`/connect`) with `example/acme-payments` to populate the fixture queue.

@@ -38,4 +38,13 @@ Set `VITE_USE_FIXTURES=false` once the FastAPI Engine serves `GET /api/prs/activ
 
 ## Layout
 
-Top navbar (Logo · Sprint confidence · Repo sync) → left priority queue → center PR intelligence (summary, blast radius, assign reviewer).
+Routes (see [`docs/07-frontend-pages.md`](../docs/07-frontend-pages.md)):
+
+| Path | Page |
+| --- | --- |
+| `/` | Triage inbox |
+| `/connect` | Link project |
+| `/projects` | Manage projects |
+| `/prs/:id` | Deep-linked PR |
+
+Top navbar (Logo · Sprint confidence · Repo switcher) → left priority queue → center PR intelligence.

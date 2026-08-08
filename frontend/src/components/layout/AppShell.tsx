@@ -1,24 +1,40 @@
 import type { ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import type { SprintHealth } from '../../schemas';
+import type { LinkedProject } from '../../schemas/project';
+import { DEFAULT_FIXTURE_REPO } from '../../schemas/project';
 import { Logo } from '../Logo';
 import { SprintHealthBar } from '../sprint/SprintHealthBar';
+import { RepoSwitcher } from './RepoSwitcher';
+
+export type AppShellVariant = 'triage' | 'setup';
 
 type AppShellProps = {
   children: ReactNode;
-  sprintHealth: SprintHealth | undefined;
-  sprintLoading: boolean;
-  showSprintSkeleton: boolean;
-  repoName: string;
+  variant?: AppShellVariant;
+  sprintHealth?: SprintHealth;
+  sprintLoading?: boolean;
+  showSprintSkeleton?: boolean;
+  projects?: LinkedProject[];
+  activeProject?: LinkedProject | null;
+  onSelectProject?: (id: string) => void;
+  fallbackRepoName?: string;
   syncLabel?: string;
+  centerLabel?: string;
 };
 
 export function AppShell({
   children,
+  variant = 'triage',
   sprintHealth,
-  sprintLoading,
-  showSprintSkeleton,
-  repoName,
+  sprintLoading = false,
+  showSprintSkeleton = false,
+  projects = [],
+  activeProject = null,
+  onSelectProject,
+  fallbackRepoName = DEFAULT_FIXTURE_REPO,
   syncLabel = 'Synced',
+  centerLabel = 'Setup',
 }: AppShellProps) {
   return (
     <div className="flex h-full min-h-screen flex-col bg-velox-bg text-velox-text">
@@ -31,31 +47,31 @@ export function AppShell({
 
       <header className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 border-b border-velox-border bg-velox-card px-4 py-3">
         <div className="justify-self-start">
-          <Logo size={28} />
+          <Link to="/" className="inline-flex rounded-md focus-visible:outline-offset-4">
+            <Logo size={28} />
+          </Link>
         </div>
 
         <div className="justify-self-center">
-          <SprintHealthBar
-            health={sprintHealth}
-            isLoading={sprintLoading}
-            showSkeleton={showSprintSkeleton}
-          />
+          {variant === 'triage' ? (
+            <SprintHealthBar
+              health={sprintHealth}
+              isLoading={sprintLoading}
+              showSkeleton={showSprintSkeleton}
+            />
+          ) : (
+            <span className="text-sm text-velox-muted">{centerLabel}</span>
+          )}
         </div>
 
-        <div className="justify-self-end flex items-center gap-3">
-          <div
-            className="hidden items-center gap-2 rounded-md border border-velox-border bg-velox-elevated px-2.5 py-1.5 sm:flex"
-            title="Active repository"
-          >
-            <span className="font-mono text-xs text-velox-text">{repoName}</span>
-          </div>
-          <div className="flex items-center gap-1.5 text-xs text-velox-muted">
-            <span
-              className="inline-block size-1.5 rounded-full bg-velox-low"
-              aria-hidden
-            />
-            <span className="hidden md:inline">{syncLabel}</span>
-          </div>
+        <div className="justify-self-end">
+          <RepoSwitcher
+            projects={projects}
+            activeProject={activeProject}
+            fallbackRepoName={fallbackRepoName}
+            onSelect={onSelectProject ?? (() => undefined)}
+            syncLabel={syncLabel}
+          />
         </div>
       </header>
 

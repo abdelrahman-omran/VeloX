@@ -17,6 +17,7 @@ Ultra-lean hackathon kit. Read these before writing code. Skim order: **Explorat
 | 4 | [`04-api-contracts/`](04-api-contracts/) | REST endpoints + JSON Schemas + examples |
 | 5 | [`05-brand.md`](05-brand.md) | Identity, colors, typography, logo, dashboard theme |
 | 6 | [`06-competitors.md`](06-competitors.md) | Gap thesis, matrix, objections, Demo/Pitch/V2 focus |
+| 7 | [`07-frontend-pages.md`](07-frontend-pages.md) | Glass routes: triage, link project, projects, deep links |
 
 ## How to edit (modular model)
 
@@ -27,6 +28,7 @@ lld.md                   →  FastAPI module layout + BackgroundTasks (implement
 06-competitors.md        →  positioning language in PRD / demo (does not expand scope)
 04-api-contracts/schemas/*.schema.json  →  examples + API README  (wire shapes)
 05-brand.md + brand/*    →  Glass UI tokens & logo (visual system)
+07-frontend-pages.md     →  Glass route map (triage + product shell)
 ```
 
 1. **Explore audiences or jobs-to-be-done** → edit [`_shared/exploration.yml`](_shared/exploration.yml); keep [`00-exploration.md`](00-exploration.md) in sync for tables/narrative.
@@ -38,6 +40,7 @@ lld.md                   →  FastAPI module layout + BackgroundTasks (implement
 7. **Change API / LLM JSON shapes** → edit the schema under [`04-api-contracts/schemas/`](04-api-contracts/schemas/), update the matching file in `examples/`, leave markdown pointing at those paths.
 8. **Pick a backend stack** → fill the decision slot in [`03-architecture.md`](03-architecture.md). Contracts stay stack-agnostic.
 9. **Change brand / theme / logo** → edit [`05-brand.md`](05-brand.md) and files under [`brand/`](brand/).
+10. **Change Glass routes / product shell pages** → edit [`07-frontend-pages.md`](07-frontend-pages.md) and `frontend/src/pages/`.
 
 ## Defaults (locked for V1)
 

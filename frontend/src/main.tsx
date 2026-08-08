@@ -8,6 +8,10 @@ import '@fontsource/jetbrains-mono/600.css';
 import './index.css';
 import App from './App.tsx';
 import { ToastProvider } from './components/ui/Toast';
+import { ConnectPage } from './pages/ConnectPage';
+import { NotFoundPage } from './pages/NotFoundPage';
+import { ProjectsPage } from './pages/ProjectsPage';
+import { TriagePage } from './pages/TriagePage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,6 +29,10 @@ createRoot(document.getElementById('root')!).render(
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<App />} />
+            <Route path="/connect" element={<ConnectPage />} />
+            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/prs/:id" element={<TriagePage />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </BrowserRouter>
       </ToastProvider>

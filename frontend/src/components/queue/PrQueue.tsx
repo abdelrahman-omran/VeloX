@@ -11,6 +11,8 @@ type PrQueueProps = {
   showSkeleton: boolean;
   highlightedIds?: Set<string>;
   onRefresh?: () => void;
+  emptyActionLabel?: string;
+  onEmptyAction?: () => void;
 };
 
 export function PrQueue({
@@ -21,6 +23,8 @@ export function PrQueue({
   showSkeleton,
   highlightedIds,
   onRefresh,
+  emptyActionLabel = 'Link a project',
+  onEmptyAction,
 }: PrQueueProps) {
   return (
     <section
@@ -49,9 +53,9 @@ export function PrQueue({
         ) : items.length === 0 ? (
           <EmptyState
             headline="No active PRs"
-            description="When GitHub opens a pull request, it will appear here risk-sorted for triage."
-            actionLabel={onRefresh ? 'Refresh queue' : undefined}
-            onAction={onRefresh}
+            description="Link a GitHub project, then open a PR — it will appear here risk-sorted for triage."
+            actionLabel={onEmptyAction ? emptyActionLabel : onRefresh ? 'Refresh queue' : undefined}
+            onAction={onEmptyAction ?? onRefresh}
           />
         ) : (
           <ul role="listbox" aria-label="Active pull requests">
