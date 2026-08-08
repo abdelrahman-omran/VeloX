@@ -1,4 +1,5 @@
   # Database Schema
+> **Stack:** PostgreSQL · FastAPI BackgroundTasks · Modular Monolith  
 
 ---
 
