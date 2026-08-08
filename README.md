@@ -1,4 +1,4 @@
-# Mergent
+# VeloX
 
 Engineering Intelligence Before the Merge. — AI-powered decision support that connects GitHub delivery signals to Team Lead action: PR risk scoring, blast-radius hints, and mocked sprint-health visibility for a demo-first DevOps hackathon.
 

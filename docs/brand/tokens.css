@@ -1,23 +1,23 @@
 /**
- * Mergent design tokens — chill production dark palette (GitHub/Linear/Grafana-adjacent).
+ * VeloX design tokens — chill production dark palette (GitHub/Linear/Grafana-adjacent).
  * Import in the Glass React app (e.g. src/styles/tokens.css) or copy beside Tailwind.
  */
 
 :root {
-  --mergent-bg: #0b0e14;
-  --mergent-card: #131820;
-  --mergent-elevated: #1a212c;
-  --mergent-border: #243041;
-  --mergent-text: #e8eef6;
-  --mergent-muted: #8b97a8;
-  --mergent-brand: #4c8bf5; /* Cool production blue — links, focus, one CTA */
-  --mergent-brand-hover: #6ba0f7;
-  --mergent-brand-soft: rgba(76, 139, 245, 0.12); /* Selected wash — no glow */
-  --mergent-low: #3d9b74; /* Desaturated safe */
-  --mergent-med: #d19a26; /* Desaturated amber */
-  --mergent-high: #e24b4a; /* Desaturated danger */
+  --velox-bg: #0b0e14;
+  --velox-card: #131820;
+  --velox-elevated: #1a212c;
+  --velox-border: #243041;
+  --velox-text: #e8eef6;
+  --velox-muted: #8b97a8;
+  --velox-brand: #4c8bf5; /* Cool production blue — links, focus, one CTA */
+  --velox-brand-hover: #6ba0f7;
+  --velox-brand-soft: rgba(76, 139, 245, 0.12); /* Selected wash — no glow */
+  --velox-low: #3d9b74; /* Desaturated safe */
+  --velox-med: #d19a26; /* Desaturated amber */
+  --velox-high: #e24b4a; /* Desaturated danger */
 
   color-scheme: dark;
-  background-color: var(--mergent-bg);
-  color: var(--mergent-text);
+  background-color: var(--velox-bg);
+  color: var(--velox-text);
 }

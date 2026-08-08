@@ -1,4 +1,4 @@
-# Mergent Brand Kit
+# VeloX Brand Kit
 
 > **Product SoT:** [`_shared/product.yml`](_shared/product.yml)  
 > **Tokens & logo:** [`brand/`](brand/)
@@ -11,10 +11,10 @@ Dark-mode-native developer-tool identity for the Glass dashboard and pitch mater
 
 | Element | Value |
 | --- | --- |
-| **Name** | Mergent |
+| **Name** | VeloX |
 | **Tagline** | Engineering Intelligence Before the Merge. |
 | **Secondary motto** | Clear sightlines for software delivery. |
-| **Wordmark** | `Mergent` + optional mono `AI` badge (not `Mergent.ai` in UI chrome) |
+| **Wordmark** | `VeloX` + optional mono `AI` badge (not `VeloX.ai` in UI chrome) |
 
 ### Brand voice
 
@@ -67,7 +67,7 @@ Map API `risk_level` (`low` / `medium` / `high`) from fixtures in [`04-api-contr
 ### Implementation
 
 - CSS variables: [`brand/tokens.css`](brand/tokens.css)
-- Tailwind extend snippet: [`brand/tailwind.mergent.extend.js`](brand/tailwind.mergent.extend.js)
+- Tailwind extend snippet: [`brand/tailwind.velox.extend.js`](brand/tailwind.velox.extend.js)
 
 ---
 
@@ -106,7 +106,7 @@ Geometric emblem: PR branch split + foresight prism/shield. Nodes use **brand bl
 - **Minimum emblem size:** 20px; do not shrink below that.
 - **Clear space:** ≥ 8px around the lockup.
 - **Prism stroke:** brand blue → muted slate (quiet, not rainbow).
-- **Wordmark:** bold tracking-tight `Mergent` in text main.
+- **Wordmark:** bold tracking-tight `VeloX` in text main.
 - **AI badge:** mono 10px; muted gray fill/border (`muted` at ~15% / ~25%); text muted — not indigo.
 - Do not recolor nodes to indigo/cyan.
 - Favicon / slide deck: use `logo.svg` (emblem-only crop is fine).
@@ -132,7 +132,7 @@ flowchart LR
 
 ### Top navbar
 
-1. **Left:** Logo lockup (`Mergent` + `AI`).
+1. **Left:** Logo lockup (`VeloX` + `AI`).
 2. **Center:** Sprint health indicator — e.g. `Confidence: 84%` with a **flat** status dot (low / med / high).
 3. **Right:** Active repo switcher (`org/repo-name`) + GitHub sync status.
 
@@ -178,8 +178,8 @@ flowchart LR
 When scaffolding Glass:
 
 1. Import [`brand/tokens.css`](brand/tokens.css) (or copy into `src/styles/`).
-2. Merge [`brand/tailwind.mergent.extend.js`](brand/tailwind.mergent.extend.js) into `tailwind.config`.
+2. Merge [`brand/tailwind.velox.extend.js`](brand/tailwind.velox.extend.js) into `tailwind.config`.
 3. Load Geist + JetBrains Mono (or CDN / `next/font` equivalent).
 4. Mount [`brand/Logo.tsx`](brand/Logo.tsx) in the navbar.
-5. Wire risk badges to `mergent.low` / `mergent.med` / `mergent.high` only.
-6. Use `mergent.brand` sparingly; AI panels get hairline borders only.
+5. Wire risk badges to `velox.low` / `velox.med` / `velox.high` only.
+6. Use `velox.brand` sparingly; AI panels get hairline borders only.

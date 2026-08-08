@@ -1,6 +1,6 @@
 # Competitor Analysis & Positioning
 
-> **Product:** Mergent ([`_shared/product.yml`](_shared/product.yml))  
+> **Product:** VeloX ([`_shared/product.yml`](_shared/product.yml))  
 > **Feature gate:** [`02-demo-use-case.md`](02-demo-use-case.md) — positioning does not expand V1 scope.  
 > Labels: **Demo now** = stage-provable · **Pitch carefully** = say it, don’t oversell · **V2 later** = roadmap only.
 
@@ -8,7 +8,7 @@
 
 ## 1. Positioning one-liner
 
-**Mergent sits in the gap between AI PR reviewers and engineering-management platforms:** it connects *micro* code-level diffs and blast radius to *macro* Team Lead delivery triage — without spamming inline nits or shipping passive DORA charts.
+**VeloX sits in the gap between AI PR reviewers and engineering-management platforms:** it connects *micro* code-level diffs and blast radius to *macro* Team Lead delivery triage — without spamming inline nits or shipping passive DORA charts.
 
 Canonical gap (SoT): `positioning.gap` in [`product.yml`](_shared/product.yml).
 
@@ -33,7 +33,7 @@ Canonical gap (SoT): `positioning.gap` in [`product.yml`](_shared/product.yml).
 │  • Missing: Understanding of actual code diffs         │
 └────────────────────────────────────────────────────────┘
 
-                    ★ Mergent ★
+                    ★ VeloX ★
          Micro risk + blast → Team Lead triage
 ```
 
@@ -96,7 +96,7 @@ Canonical gap (SoT): `positioning.gap` in [`product.yml`](_shared/product.yml).
 
 ## 3. Competitive matrix (honest V1)
 
-| Feature / Metric | CodeRabbit / Qodo | LinearB / Jellyfish | AppMap | **Mergent (V1)** |
+| Feature / Metric | CodeRabbit / Qodo | LinearB / Jellyfish | AppMap | **VeloX (V1)** |
 | --- | --- | --- | --- | --- |
 | **Primary user** | Developer | VP / Executive | Architect | **Team Lead / Eng Manager** |
 | **Line-by-line code review** | Excellent | None | None | **Out of scope** — high-level summary only |
@@ -128,11 +128,11 @@ Use existing `ai_summary` + `blast_radius_services` fields — **no new API** re
 
 ### “How is this different from CodeRabbit or GitHub Copilot for PRs?”
 
-> CodeRabbit operates at the *developer line-of-code* level — it tells you if a function looks wrong. Mergent operates at the *engineering management* level — how a change hits architecture, who should review to avoid bottlenecks, and whether it pressures the sprint. We don’t spam inline comments; we triage decisions.
+> CodeRabbit operates at the *developer line-of-code* level — it tells you if a function looks wrong. VeloX operates at the *engineering management* level — how a change hits architecture, who should review to avoid bottlenecks, and whether it pressures the sprint. We don’t spam inline comments; we triage decisions.
 
 ### “LinearB already gives sprint metrics. Why build this?”
 
-> LinearB is strong at *retrospective* metrics — it shows cycle time after the fact. Mergent is *code-aware*: it reads the diff and blast radius of incoming PRs so a Team Lead can act before the deadline. **In this hackathon**, sprint confidence is a demo signal wired to that story — not a full forecasting product.
+> LinearB is strong at *retrospective* metrics — it shows cycle time after the fact. VeloX is *code-aware*: it reads the diff and blast radius of incoming PRs so a Team Lead can act before the deadline. **In this hackathon**, sprint confidence is a demo signal wired to that story — not a full forecasting product.
 
 ---
 

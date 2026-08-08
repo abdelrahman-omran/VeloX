@@ -1,8 +1,8 @@
 /**
- * Mergent Tailwind theme extension.
+ * VeloX Tailwind theme extension.
  * Merge into theme.extend of your tailwind.config.{js,ts}:
  *
- *   const mergentExtend = require('./docs/brand/tailwind.mergent.extend.js')
+ *   const veloxExtend = require('./docs/brand/tailwind.velox.extend.js')
  *   // or copy the `extend` object after scaffolding frontend/
  *
  * Requires darkMode: 'class' (or always-dark root with class="dark").
@@ -11,7 +11,7 @@
 
 module.exports = {
   colors: {
-    mergent: {
+    velox: {
       bg: '#0B0E14',
       card: '#131820',
       elevated: '#1A212C',
