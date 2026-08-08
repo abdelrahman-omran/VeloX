@@ -1,6 +1,6 @@
-# Agentic Team Lead Assistant
+# Mergent
 
-AI-powered decision support that connects GitHub delivery signals to Team Lead action — PR risk scoring, blast-radius hints, and mocked sprint-health visibility for a demo-first DevOps hackathon.
+Engineering Intelligence Before the Merge. — AI-powered decision support that connects GitHub delivery signals to Team Lead action: PR risk scoring, blast-radius hints, and mocked sprint-health visibility for a demo-first DevOps hackathon.
 
 ## Planning docs
 
@@ -13,6 +13,8 @@ Start here before writing code: **[docs/README.md](docs/README.md)**
 | [Demo use case](docs/02-demo-use-case.md) | 3-minute pitch script (feature gate) |
 | [Architecture](docs/03-architecture.md) | Data flow + stack tradeoffs (Go / TS / Python TBD) |
 | [API contracts](docs/04-api-contracts/) | REST + LLM JSON schemas and examples |
+| [Brand](docs/05-brand.md) | Identity, color tokens, typography, logo, dashboard theme |
 
 Shared product facts: [`docs/_shared/product.yml`](docs/_shared/product.yml).  
-Broader persona/use-case catalog: [`docs/_shared/exploration.yml`](docs/_shared/exploration.yml).
+Broader persona/use-case catalog: [`docs/_shared/exploration.yml`](docs/_shared/exploration.yml).  
+Drop-in tokens & logo: [`docs/brand/`](docs/brand/).

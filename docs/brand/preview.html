@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mergent — Brand Board</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&family=Inter:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --mergent-bg: #0b0e14;
+        --mergent-card: #131820;
+        --mergent-elevated: #1a212c;
+        --mergent-border: #243041;
+        --mergent-text: #e8eef6;
+        --mergent-muted: #8b97a8;
+        --mergent-brand: #4c8bf5;
+        --mergent-brand-hover: #6ba0f7;
+        --mergent-low: #3d9b74;
+        --mergent-med: #d19a26;
+        --mergent-high: #e24b4a;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--mergent-bg);
+        color: var(--mergent-text);
+        font-family: Inter, system-ui, sans-serif;
+        padding: 48px 32px 64px;
+      }
+
+      .wrap {
+        max-width: 960px;
+        margin: 0 auto;
+      }
+
+      .eyebrow {
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--mergent-muted);
+        margin-bottom: 12px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 24px;
+        font-weight: 700;
+      }
+
+      .tagline {
+        margin: 0 0 40px;
+        color: var(--mergent-muted);
+        font-size: 15px;
+      }
+
+      .lockup {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 28px 32px;
+        background: var(--mergent-card);
+        border: 1px solid var(--mergent-border);
+        border-radius: 12px;
+        margin-bottom: 40px;
+      }
+
+      .wordmark {
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+      }
+
+      .ai-badge {
+        margin-left: 8px;
+        padding: 3px 8px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10px;
+        font-weight: 600;
+        border-radius: 4px;
+        color: var(--mergent-muted);
+        background: rgba(139, 151, 168, 0.15);
+        border: 1px solid rgba(139, 151, 168, 0.25);
+        vertical-align: middle;
+      }
+
+      .sizes {
+        display: flex;
+        align-items: flex-end;
+        gap: 32px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid var(--mergent-border);
+        width: 100%;
+      }
+
+      .size-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .size-item span {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        color: var(--mergent-muted);
+      }
+
+      h2 {
+        margin: 0 0 16px;
+        font-size: 16px;
+        font-weight: 600;
+        color: #d5dee9;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 12px;
+        margin-bottom: 40px;
+      }
+
+      .swatch {
+        border: 1px solid var(--mergent-border);
+        border-radius: 10px;
+        overflow: hidden;
+        background: var(--mergent-card);
+      }
+
+      .chip {
+        height: 72px;
+      }
+
+      .meta {
+        padding: 10px 12px;
+      }
+
+      .meta strong {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .meta code {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        color: var(--mergent-muted);
+      }
+
+      .risk-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 40px;
+      }
+
+      .risk {
+        flex: 1;
+        min-width: 160px;
+        padding: 16px;
+        border-radius: 10px;
+        border: 1px solid var(--mergent-border);
+        background: var(--mergent-card);
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+        /* flat — no glow */
+      }
+
+      .risk .label {
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .risk .hex {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        color: var(--mergent-muted);
+      }
+
+      .ai-banner {
+        padding: 20px 24px;
+        border-radius: 12px;
+        background: var(--mergent-card);
+        border: 1px solid var(--mergent-border);
+      }
+
+      .ai-banner .kicker {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        color: var(--mergent-muted);
+        margin-bottom: 8px;
+      }
+
+      .ai-banner p {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #b8c2d0;
+      }
+
+      .emblem-node-brand { fill: #4c8bf5; }
+      .emblem-node-muted { fill: #8b97a8; }
+      .emblem-node-safe { fill: #3d9b74; }
+      .emblem-edge-brand { stroke: #4c8bf5; }
+      .emblem-edge-muted { stroke: #8b97a8; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <p class="eyebrow">Mergent brand board</p>
+      <h1>Logo &amp; color system</h1>
+      <p class="tagline">Engineering Intelligence Before the Merge. — chill production palette</p>
+
+      <div class="lockup">
+        <svg width="48" height="48" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M16 2L28 8V24L16 30L4 24V8L16 2Z" stroke="url(#mergent-grad)" stroke-width="2" stroke-linejoin="round" opacity="0.8" />
+          <circle cx="11" cy="11" r="2.5" class="emblem-node-brand" />
+          <circle cx="21" cy="11" r="2.5" class="emblem-node-muted" />
+          <circle cx="16" cy="21" r="2.5" class="emblem-node-safe" />
+          <path d="M11 13.5V17L14.5 20.5" class="emblem-edge-brand" stroke-width="2" stroke-linecap="round" />
+          <path d="M21 13.5V17L17.5 20.5" class="emblem-edge-muted" stroke-width="2" stroke-linecap="round" />
+          <defs>
+            <linearGradient id="mergent-grad" x1="4" y1="2" x2="28" y2="30" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#4C8BF5" />
+              <stop offset="1" stop-color="#243041" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <div>
+          <div>
+            <span class="wordmark">Mergent</span>
+            <span class="ai-badge">AI</span>
+          </div>
+          <div class="sizes">
+            <div class="size-item">
+              <svg width="20" height="20" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 2L28 8V24L16 30L4 24V8L16 2Z" stroke="url(#g1)" stroke-width="2" stroke-linejoin="round" opacity="0.8" />
+                <circle cx="11" cy="11" r="2.5" fill="#4C8BF5" />
+                <circle cx="21" cy="11" r="2.5" fill="#8B97A8" />
+                <circle cx="16" cy="21" r="2.5" fill="#3D9B74" />
+                <path d="M11 13.5V17L14.5 20.5" stroke="#4C8BF5" stroke-width="2" stroke-linecap="round" />
+                <path d="M21 13.5V17L17.5 20.5" stroke="#8B97A8" stroke-width="2" stroke-linecap="round" />
+                <defs>
+                  <linearGradient id="g1" x1="4" y1="2" x2="28" y2="30" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#4C8BF5" /><stop offset="1" stop-color="#243041" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <span>20px min</span>
+            </div>
+            <div class="size-item">
+              <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 2L28 8V24L16 30L4 24V8L16 2Z" stroke="url(#g2)" stroke-width="2" stroke-linejoin="round" opacity="0.8" />
+                <circle cx="11" cy="11" r="2.5" fill="#4C8BF5" />
+                <circle cx="21" cy="11" r="2.5" fill="#8B97A8" />
+                <circle cx="16" cy="21" r="2.5" fill="#3D9B74" />
+                <path d="M11 13.5V17L14.5 20.5" stroke="#4C8BF5" stroke-width="2" stroke-linecap="round" />
+                <path d="M21 13.5V17L17.5 20.5" stroke="#8B97A8" stroke-width="2" stroke-linecap="round" />
+                <defs>
+                  <linearGradient id="g2" x1="4" y1="2" x2="28" y2="30" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#4C8BF5" /><stop offset="1" stop-color="#243041" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <span>28px navbar</span>
+            </div>
+            <div class="size-item">
+              <svg width="40" height="40" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 2L28 8V24L16 30L4 24V8L16 2Z" stroke="url(#g3)" stroke-width="2" stroke-linejoin="round" opacity="0.8" />
+                <circle cx="11" cy="11" r="2.5" fill="#4C8BF5" />
+                <circle cx="21" cy="11" r="2.5" fill="#8B97A8" />
+                <circle cx="16" cy="21" r="2.5" fill="#3D9B74" />
+                <path d="M11 13.5V17L14.5 20.5" stroke="#4C8BF5" stroke-width="2" stroke-linecap="round" />
+                <path d="M21 13.5V17L17.5 20.5" stroke="#8B97A8" stroke-width="2" stroke-linecap="round" />
+                <defs>
+                  <linearGradient id="g3" x1="4" y1="2" x2="28" y2="30" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#4C8BF5" /><stop offset="1" stop-color="#243041" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <span>40px hero</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h2>Core palette</h2>
+      <div class="grid">
+        <div class="swatch"><div class="chip" style="background:#0B0E14;border-bottom:1px solid #243041"></div><div class="meta"><strong>BG Primary</strong><code>#0B0E14</code></div></div>
+        <div class="swatch"><div class="chip" style="background:#131820"></div><div class="meta"><strong>BG Surface</strong><code>#131820</code></div></div>
+        <div class="swatch"><div class="chip" style="background:#1A212C"></div><div class="meta"><strong>Elevated</strong><code>#1A212C</code></div></div>
+        <div class="swatch"><div class="chip" style="background:#243041"></div><div class="meta"><strong>Border</strong><code>#243041</code></div></div>
+        <div class="swatch"><div class="chip" style="background:#E8EEF6"></div><div class="meta"><strong>Text Main</strong><code>#E8EEF6</code></div></div>
+        <div class="swatch"><div class="chip" style="background:#8B97A8"></div><div class="meta"><strong>Text Muted</strong><code>#8B97A8</code></div></div>
+        <div class="swatch"><div class="chip" style="background:#4C8BF5"></div><div class="meta"><strong>Brand Accent</strong><code>#4C8BF5</code></div></div>
+        <div class="swatch"><div class="chip" style="background:#6BA0F7"></div><div class="meta"><strong>Brand Hover</strong><code>#6BA0F7</code></div></div>
+      </div>
+
+      <h2>Risk status</h2>
+      <div class="risk-row">
+        <div class="risk">
+          <div class="label"><span class="dot" style="background:#3D9B74"></span>Low / Safe</div>
+          <div class="hex">#3D9B74</div>
+        </div>
+        <div class="risk">
+          <div class="label"><span class="dot" style="background:#D19A26"></span>Medium / Review</div>
+          <div class="hex">#D19A26</div>
+        </div>
+        <div class="risk">
+          <div class="label"><span class="dot" style="background:#E24B4A"></span>High / Blast Radius</div>
+          <div class="hex">#E24B4A</div>
+        </div>
+      </div>
+
+      <h2>AI panel (hairline only)</h2>
+      <div class="ai-banner">
+        <div class="kicker">Reasoning</div>
+        <p>
+          This PR touches auth token refresh and session storage. Blast radius spans
+          <strong style="color:var(--mergent-text)">3 services</strong>. Assign a backend lead before merge.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

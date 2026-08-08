@@ -1,13 +1,13 @@
 # Single source of truth for product facts.
 # Edit this file first; PRD / demo / architecture reference it.
 
-name: Agentic Team Lead Assistant
-slug: agentic-team-lead-assistant
-tagline: AI-powered decision support that connects GitHub delivery signals to Team Lead action.
+name: Mergent
+slug: mergent
+tagline: Engineering Intelligence Before the Merge.
 
 elevator_pitch: >
-  An AI decision-support agent that turns fragmented GitHub and CI/CD activity into
-  real-time delivery visibility for Team Leads. It scores pull-request risk, estimates
+  Mergent is an AI decision-support agent that turns fragmented GitHub and CI/CD activity
+  into real-time delivery visibility for Team Leads. It scores pull-request risk, estimates
   blast radius, and surfaces mocked sprint-health signals so leaders act before deadlines slip.
 
 target_audience: >
