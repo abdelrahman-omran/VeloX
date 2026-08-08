@@ -245,6 +245,27 @@ use_cases:
     outcome: Load signals per person; reassignment suggestions
     horizon: v2
 
+  - id: uc_morning_action_feed
+    title: Morning Action Feed for Team Lead triage
+    actors: [team_lead, eng_manager]
+    trigger: Start of day / standup prep
+    goal: Prescriptive inbox (fast-track, split, descope) instead of passive charts
+    outcome: Ranked actions with one-click next steps
+    horizon: v2
+    note: >
+      V1 maps the same intent to risk-sorted PR queue + Assign CTA.
+      See docs/06-competitors.md — do not rebuild Glass for this in the hackathon.
+
+  - id: uc_workload_aware_routing
+    title: Route reviewers by domain ownership and current workload
+    actors: [team_lead, eng_manager]
+    trigger: High-risk or high-blast PR needs assignment
+    goal: Avoid blame-only routing and review bottlenecks
+    outcome: Suggested reviewer with ownership + load rationale
+    horizon: v2
+    note: >
+      V1 recommends reviewers from PR/LLM context only; workload balancing is V2.
+
   - id: uc_real_delivery_forecast
     title: Predict sprint/release completion confidence (real model)
     actors: [eng_manager, scrum_master, product_manager, release_manager]

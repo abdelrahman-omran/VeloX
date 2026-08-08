@@ -57,7 +57,7 @@ Returns the scored PR queue for the dashboard.
       "risk_score": 8,
       "risk_level": "high",
       "blast_radius_services": ["auth-service", "database-schema"],
-      "ai_summary": "Changes to user authentication tokens. Requires database rollback script.",
+      "ai_summary": "PR touches auth token refresh (micro) → blast radius includes auth-service and database-schema → elevates delivery risk for the current sprint (macro). Prefer a backend owner review before merge.",
       "recommended_reviewers": ["backend-lead"],
       "updated_at": "2026-08-02T12:00:00Z"
     }

@@ -18,6 +18,7 @@
 1. Brainstorm with the full lists below.
 2. Promote only what the demo/PRD needs into [`product.yml`](_shared/product.yml) `in_scope`.
 3. Keep everything else as `v2` / `future` horizon — resist scope creep.
+4. Market / competitor framing (CodeRabbit vs LinearB gap) lives in [`06-competitors.md`](06-competitors.md); exploration only carries V2 UCs that fall out of that analysis.
 
 ```text
 exploration.yml  →  this page (human view)
@@ -78,6 +79,8 @@ Canonical entries: `use_cases` in [`exploration.yml`](_shared/exploration.yml).
 | `uc_pm_milestone_risk` | Milestone language for stakeholders | PM, EM, Director | Planning/update → plain-language risk |
 | `uc_jira_alignment` | Align tracker status with GitHub | PM, SM, EM | Status rituals → linked PR/issue drift alerts |
 | `uc_workload_overload` | Detect overloaded reviewers/authors | EM, Team Lead, SM | Queue growth → load signals & rebalance |
+| `uc_morning_action_feed` | Morning Action Feed (prescriptive triage) | Team Lead, EM | Start of day → ranked actions (V1 = queue + CTA) |
+| `uc_workload_aware_routing` | Reviewers by ownership + workload | Team Lead, EM | Needs assignment → load-aware suggestion |
 
 ### Future / stretch
 
@@ -114,6 +117,8 @@ Marks show **likely** interest, not implementation priority.
 | PM milestone risk | ● | ○ | ○ | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ | ● | ○ |
 | Jira alignment | ● | ○ | ○ | ○ | ● | ● | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | Overload detect | ● | ● | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
+| Morning Action Feed | ● | ● | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
+| Workload-aware route | ● | ● | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | Real forecast | ● | ○ | ○ | ○ | ● | ● | ○ | ○ | ○ | ○ | ● | ○ | ○ |
 | Tech debt radar | ● | ○ | ● | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ● |
 | Release go/no-go | ● | ○ | ○ | ○ | ○ | ○ | ● | ○ | ● | ○ | ● | ○ | ○ |
@@ -142,6 +147,7 @@ Marks show **likely** interest, not implementation priority.
 | Doc | Relationship |
 | --- | --- |
 | [PRD](01-prd.md) | Narrowed agreement — only promoted scope |
+| [Competitors](06-competitors.md) | Market gap, antagonists, Demo/Pitch/V2 differentiators |
 | [Demo use case](02-demo-use-case.md) | Feature gate for what we build now |
 | [Architecture](03-architecture.md) | How V1 data flows; ignore future UCs until needed |
 | [API contracts](04-api-contracts/) | Shapes for promoted V1 use cases |
