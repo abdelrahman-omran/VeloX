@@ -26,7 +26,7 @@ Optional path (demo nicety): `Engine → GitHub API` (PR comment with AI summary
 | Box | Role | Notes |
 | --- | --- | --- |
 | **Event Source** | GitHub Webhooks | `pull_request` (opened/synchronize/reopened). Verify `X-Hub-Signature-256`. |
-| **Engine** | Backend API + workers | Normalize payload, call LLM, persist, serve REST. Stack **TBD** below. |
+| **Engine** | Backend API + in-process BackgroundTasks | Normalize payload, schedule I/O-bound scoring (GitHub + LLM), persist, serve REST. Prefer **Python (FastAPI)** per [`lld.md`](lld.md); no separate worker/Redis for V1. |
 | **Brain** | LLM (OpenAI-compatible) | Must return JSON matching [`llm-output.schema.json`](04-api-contracts/schemas/llm-output.schema.json). |
 | **Storage** | SQLite | PR metadata + AI scores. Postgres optional later / Docker. |
 | **Glass** | TypeScript / React | Consumes `GET /api/prs/active` and `GET /api/sprint/health`. |
@@ -37,14 +37,14 @@ Contracts between Brain / Engine / Glass are **stack-agnostic**. Changing Go ↔
 
 ## Stack decision (placeholder)
 
-**Decision: TBD — fill before Day 1 coding.**
+**Decision lean:** Python (FastAPI) with in-process `BackgroundTasks` for scoring/analysis — see [`lld.md`](lld.md). Fill the table below only if the team overrides that lean.
 
 | Criterion | Go | TypeScript (Node) | Python (FastAPI) |
 | --- | --- | --- | --- |
-| Webhook concurrency | Strong (goroutines, low overhead) | Good (async event loop) | Good enough for demo |
+| Webhook concurrency | Strong (goroutines, low overhead) | Good (async event loop) | Good enough for demo; BackgroundTasks for I/O jobs |
 | LLM / JSON DX | More verbose; solid HTTP libs | Excellent (shared types with FE possible) | Excellent (Pydantic / JSON Schema) |
 | Type sharing with React | Separate OpenAPI/types gen | Same language family; easy shared types | Schema-first; generate or hand-copy |
-| Ops / single binary | Excellent | Needs Node runtime | Needs Python runtime / venv |
+| Ops / single binary | Excellent | Needs Node runtime | Needs Python runtime / venv; **single process** (no Redis worker) |
 | Team familiarity / speed | TBD | TBD | TBD |
 | Hackathon fit | Fast runtime; steeper JSON/LLM glue | Fastest full-stack TS team | Fastest AI-glue team; matches common LLM tutorials |
 
@@ -52,12 +52,12 @@ Contracts between Brain / Engine / Glass are **stack-agnostic**. Changing Go ↔
 
 1. Fill the “Team familiarity / speed” row honestly.
 2. Prefer the stack the majority of implementers can ship without fighting the toolchain.
-3. Record the choice here and in `defaults.backend_stack` inside [`product.yml`](_shared/product.yml).
+3. Record the choice here and in `defaults.backend_stack` inside [`product.yml`](_shared/product.yml). Default lean if undecided: **Python / FastAPI**.
 
 ```text
-Chosen backend: _______________
+Chosen backend: Python (FastAPI) — unless overridden _______________
 Date: _______________
-Rationale (1–2 lines): _______________
+Rationale (1–2 lines): BackgroundTasks for I/O-bound PR scoring; no ARQ/Redis in V1
 ```
 
 ---
@@ -65,10 +65,11 @@ Rationale (1–2 lines): _______________
 ## Request path (happy case)
 
 1. GitHub sends webhook → Engine verifies signature.
-2. Engine loads PR files / checks summary (GitHub API as needed).
-3. Engine calls Brain with structured instructions → validates against LLM schema.
-4. Engine upserts scored PR in SQLite.
-5. Glass polls or refreshes `GET /api/prs/active`; sprint panel reads mocked `GET /api/sprint/health`.
+2. Engine upserts PR (`pending`), schedules `BackgroundTasks` scoring, returns `202`.
+3. Background task loads PR files / checks summary (GitHub API as needed).
+4. Task calls Brain with structured instructions → validates against LLM schema.
+5. Engine upserts scored PR in SQLite/Postgres.
+6. Glass polls or refreshes `GET /api/prs/active`; sprint panel reads mocked `GET /api/sprint/health`.
 
 ---
 
@@ -77,9 +78,10 @@ Rationale (1–2 lines): _______________
 | Risk | Symptom | Mitigation |
 | --- | --- | --- |
 | Bad webhook secret / signature | Events ignored | Fail loud in logs; test with GitHub delivery UI |
-| LLM timeout / rate limit | PR stuck “scoring” | Timeout + retry; fall back to example JSON on stage |
+| LLM timeout / rate limit | PR stuck “scoring” | In-task retry (`max_tries`); fall back to example JSON on stage |
 | Schema drift | UI breaks / parse errors | Validate LLM output; reject + re-prompt once |
 | SQLite write races | Rare lock errors under burst | Serialize writes; fine for demo load |
+| API process killed mid-job | Score never lands | Known V1 BackgroundTasks limit; replay webhook |
 | Tunnel / network drop | No live webhook on stage | Pre-warm + offline fixtures from `examples/` |
 
 ---
@@ -103,4 +105,5 @@ Do not commit secrets. Use a local `.env` (gitignored).
 ## Related docs
 
 - [Demo script](02-demo-use-case.md) — which path must work on stage  
+- [LLD](lld.md) — FastAPI layout, BackgroundTasks, module boundaries  
 - [API contracts](04-api-contracts/) — exact JSON between components  

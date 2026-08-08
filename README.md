@@ -11,7 +11,8 @@ Start here before writing code: **[docs/README.md](docs/README.md)**
 | [Exploration](docs/00-exploration.md) | Possible users and use cases (discovery; not V1 scope) |
 | [PRD](docs/01-prd.md) | One-pager product agreement |
 | [Demo use case](docs/02-demo-use-case.md) | 3-minute pitch script (feature gate) |
-| [Architecture](docs/03-architecture.md) | Data flow + stack tradeoffs (Go / TS / Python TBD) |
+| [Architecture](docs/03-architecture.md) | Data flow + stack tradeoffs (FastAPI lean) |
+| [LLD](docs/lld.md) | FastAPI modular monolith + BackgroundTasks |
 | [API contracts](docs/04-api-contracts/) | REST + LLM JSON schemas and examples |
 
 Shared product facts: [`docs/_shared/product.yml`](docs/_shared/product.yml).  

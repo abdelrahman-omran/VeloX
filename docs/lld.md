@@ -1,8 +1,8 @@
 # Agentic Team Lead Assistant — Low-Level Design
 
-> **Stack:** Python (FastAPI) · ARQ · PostgreSQL · Redis · React  
+> **Stack:** Python (FastAPI) · PostgreSQL · React  
 > **Architecture:** Modular Monolith (single deployable, clean domain boundaries)  
-> **Date:** 2026-08-04
+> **Date:** 2026-08-08
 
 ---
 
@@ -11,11 +11,11 @@
 Agentic Team Lead Assistant is a single-backend application that acts as an AI-powered team lead. It receives GitHub webhooks, analyzes PRs through specialized AI agents, and serves a React dashboard with prioritization, blast radius, and sprint forecasting.
 
 **Key decisions:**
-- **ARQ** for background jobs — asyncio-native, typed, minimal ops.
-- **PostgreSQL** kept for persistence — MVCC (Multi-Version Concurrency Control) + busy-timeout make it viable for modest worker concurrency.
-- **Redis** required by ARQ for the job queue only.
+- **FastAPI BackgroundTasks** for post-webhook I/O work (GitHub HTTP + LLM HTTP) — same process as the API, no Redis, no second worker container.
+- **PostgreSQL** for persistence — MVCC (Multi-Version Concurrency Control) + connection pooling for modest concurrent task load.
+- **No Redis in V1** — durable queues (ARQ/Celery) only if multi-instance durability is required later.
 - **Agentic architecture** — `orchestrator` coordinates specialized agents (`prioritization`, `blast_radius`, `sprint_forecast`).
-- **Modular monolith** — domains are separate modules with zero cross-imports.
+- **Modular monolith** — domains are separate modules with zero cross-imports; **one deploy unit**.
 
 ---
 
@@ -29,7 +29,7 @@ agentic-team-lead/
 │   │   ├── main.py                      # FastAPI factory, router mount, lifespan
 │   │   ├── config.py                    # Pydantic Settings (env-only, no secrets baked)
 │   │   ├── database.py                  # SQLAlchemy engine + session (PostgreSQL, MVCC)
-│   │   ├── dependencies.py              # FastAPI Depends: DB, Redis, HTTP clients
+│   │   ├── dependencies.py              # FastAPI Depends: DB, HTTP clients
 │   │   │
 │   │   ├── common/                      # Shared kernel (both modules may read, neither owns)
 │   │   │   ├── __init__.py
@@ -39,7 +39,7 @@ agentic-team-lead/
 │   │   │
 │   │   ├── api/                         # HTTP layer (thin controllers)
 │   │   │   ├── __init__.py
-│   │   │   ├── webhooks.py              # POST /webhooks/github → enqueue ARQ task
+│   │   │   ├── webhooks.py              # POST /webhooks/github → BackgroundTasks
 │   │   │   ├── prs.py                   # GET /api/prs/active, GET /api/prs/{id}
 │   │   │   └── dashboard.py             # GET /api/sprint/health, GET /api/prs/overview
 │   │   │
@@ -68,13 +68,12 @@ agentic-team-lead/
 │   │   │           ├── prompt_loader.py # Loads prompt templates by agent/task
 │   │   │           └── response_validator.py  # Pydantic validation of LLM outputs
 │   │   │
-│   │   └── workers/                     # ARQ task definitions + queue wiring
+│   │   └── workers/                     # In-process async callables for BackgroundTasks
 │   │       ├── __init__.py
-│   │       ├── queue.py                 # Redis pool factory, ARQ settings
-│   │       ├── prioritization.py        # @task score_pr_task(ctx, pr_id, ...)
-│   │       └── blast_radius.py          # @task analyze_pr_task(ctx, pr_id)
+│   │       ├── retry.py                 # with_io_retry(max_tries, retry_delay)
+│   │       ├── prioritization.py        # async score_pr_task(pr_id, owner, repo, number)
+│   │       └── blast_radius.py          # async analyze_pr_task(pr_id)
 │   │
-│   ├── worker.py                        # Entrypoint: `arq app.worker.WorkerSettings`
 │   ├── tests/
 │   │   ├── conftest.py
 │   │   ├── test_webhook.py
@@ -105,7 +104,7 @@ agentic-team-lead/
 │   ├── nginx.conf
 │   └── Dockerfile
 │
-├── docker-compose.yml                   # prod-like stack
+├── docker-compose.yml                   # prod-like stack (API + Postgres + frontend; no Redis)
 ├── docker-compose.override.yml          # dev overrides (hot reload)
 ├── .dockerignore
 └── .env.example
@@ -119,10 +118,10 @@ agentic-team-lead/
 
 | File | Responsibility |
 |------|----------------|
-| `main.py` | FastAPI app factory. Mounts routers under `/api/*`. Starts ARQ Redis pool in lifespan. Creates PostgreSQL tables on startup. |
-| `config.py` | `Pydantic Settings` class. Reads `GITHUB_WEBHOOK_SECRET`, `LLM_API_KEY`, `DATABASE_URL`, `REDIS_URL`, etc. from env. Fails fast on boot if required vars missing. |
-| `database.py` | SQLAlchemy `create_engine` + `sessionmaker`. PostgreSQL with `pool_size=10, max_overflow=20`, `poolclass=AsyncAdaptedQueuePool` for workers, `PRAGMA isolation_level=READ_COMMITTED`. |
-| `dependencies.py` | FastAPI `Depends()` providers: `get_db()` (Session), `get_redis_pool()` (ARQ), `get_http_client()` (httpx.AsyncClient singleton). |
+| `main.py` | FastAPI app factory. Mounts routers under `/api/*`. Creates PostgreSQL tables on startup. Optional app-level `asyncio.Semaphore` for concurrent LLM jobs. No Redis lifespan. |
+| `config.py` | `Pydantic Settings` class. Reads `GITHUB_WEBHOOK_SECRET`, `LLM_API_KEY`, `DATABASE_URL`, `LLM_CONCURRENCY`, etc. from env. Fails fast on boot if required vars missing. |
+| `database.py` | SQLAlchemy `create_engine` + `sessionmaker`. PostgreSQL with `pool_size=10, max_overflow=20`, `poolclass=AsyncAdaptedQueuePool`, isolation `READ_COMMITTED`. |
+| `dependencies.py` | FastAPI `Depends()` providers: `get_db()` (Session), `get_http_client()` (httpx.AsyncClient singleton). |
 
 ### Common (Shared Kernel)
 
@@ -136,7 +135,7 @@ agentic-team-lead/
 
 | File | Responsibility |
 |------|----------------|
-| `api/webhooks.py` | `POST /webhooks/github`. Verifies HMAC signature, upserts `PR` row, enqueues ARQ task, returns `202 Accepted`. |
+| `api/webhooks.py` | `POST /webhooks/github`. Verifies HMAC signature, upserts `PR` row, schedules `score_pr_task` via `BackgroundTasks`, returns `202 Accepted`. |
 | `api/prs.py` | `GET /api/prs/active` (list with scores), `GET /api/prs/{id}` (detail). |
 | `api/dashboard.py` | `GET /api/sprint/health` (aggregated KPIs), `GET /api/prs/overview` (joined view of both modules). |
 
@@ -162,14 +161,15 @@ agentic-team-lead/
 | `core/ai/llm/prompt_loader.py` | Loads prompt templates from files or constants by agent name + task type. Supports prompt versioning and A/B testing. |
 | `core/ai/llm/response_validator.py` | Pydantic-based validation of LLM JSON outputs. Enforces `llm-output.schema.json`. Raises `LLMValidationError` on schema drift. |
 
-### Workers (ARQ)
+### Workers (in-process BackgroundTasks)
 
 | File | Responsibility |
 |------|----------------|
-| `workers/queue.py` | `create_redis_pool()` — ARQ Redis connection. Shared by API (enqueue) and workers (consume). |
-| `workers/prioritization.py` | `score_pr_task(ctx, pr_id, owner, repo, number)`. Wraps `core.prioritization.service.score_pr`. ARQ handles retry on failure. |
-| `workers/blast_radius.py` | `analyze_pr_task(ctx, pr_id)`. Wraps `core.blast_radius.service.analyze_pr`. |
-| `worker.py` | Standalone entrypoint. `WorkerSettings` binds Redis, task functions, `max_jobs`, `job_timeout`, `max_tries`. |
+| `workers/retry.py` | `with_io_retry(coro_factory, max_tries=3, retry_delay=30)` for GitHub/LLM timeouts. Marks `PR.status = error` after exhaustion. |
+| `workers/prioritization.py` | `score_pr_task(pr_id, owner, repo, number)`. Opens a **new** DB session; wraps `core.prioritization.service.score_pr`. |
+| `workers/blast_radius.py` | `analyze_pr_task(pr_id)`. Opens a **new** DB session; wraps `core.blast_radius.service.analyze_pr`. |
+
+There is **no** separate `worker.py` process and **no** Redis queue.
 
 ---
 
@@ -197,10 +197,11 @@ This project follows a combination of architectural patterns and software design
 | **Dependency Injection** | `dependencies.py` + FastAPI `Depends()` | External resources such as database sessions, HTTP clients, and configuration objects are injected instead of created inside business logic. This improves testing and flexibility. |
 | **Adapter** | `github_client.py` and `llm_client.py` | Isolates third-party APIs behind internal interfaces. Changes in GitHub APIs or LLM providers only affect the adapter layer. |
 | **Strategy** | `LLMClient` interface with implementations such as `OpenAILLMClient` | Allows switching between different AI providers (OpenAI, Gemini, Claude, local models) without changing agent logic. |
-| **Command** | Background task functions (`score_pr_task`, `analyze_pr_task`) executed by workers | Encapsulates independent operations as executable tasks with support for retries and asynchronous processing. |
+| **Command** | Background task functions (`score_pr_task`, `analyze_pr_task`) scheduled via FastAPI `BackgroundTasks` | Encapsulates I/O-bound work so the request path stays fast (`202`) while scoring/analysis continues in-process. |
 | **Data Access Layer** | SQLAlchemy session management through dependency injection | Provides a clear boundary between business logic and persistence. Database implementation details remain isolated from the core system. |
 | **DTO / Schema** | Pydantic models in `schemas.py` and shared schemas | Defines strict data contracts for API communication, validation, serialization, and AI model outputs. |
-| **Idempotent Consumer** | Worker checks PR processing status before executing duplicate tasks | Protects against duplicate GitHub webhook deliveries and ensures safe retries during asynchronous processing. |
+| **Idempotent Consumer** | Task checks PR processing status before executing duplicate work | Protects against duplicate GitHub webhook deliveries and safe in-task retries. |
+| **Claim Check** | Task args carry `pr_id` (and owner/repo/number) only | Heavy payloads (diffs, scores) live in PostgreSQL, not in the scheduled task arguments. |
 
 
 ## 5. Module Boundaries (Hard Rules)
@@ -211,7 +212,7 @@ This project follows a combination of architectural patterns and software design
 │  api/prs.py                             │
 │  api/dashboard.py                       │
 └─────────────┬───────────────────────────┘
-              │ Depends()
+              │ BackgroundTasks / Depends()
 ┌─────────────▼───────────────────────────┐
 │  workers/prioritization.py              │
 │  workers/blast_radius.py                │
@@ -251,7 +252,7 @@ This project follows a combination of architectural patterns and software design
                           │
            ┌──────────────┴──────────────┐
            │  common/models.py (PR)      │
-           │  database.py (PostgreSQL)       │
+           │  database.py (PostgreSQL)   │
            └─────────────────────────────┘
 ```
 
@@ -261,7 +262,7 @@ This project follows a combination of architectural patterns and software design
 3. `core/ai/orchestrator.py` is the **only** cross-domain coordinator. Services do not call agents directly — they ask the orchestrator.
 4. Agents **never** import from services. They receive pure data (diff text, parsed graphs) and return structured results.
 5. `api/dashboard.py` is the **only** join point allowed to query both module tables in one SQL statement.
-6. `api/` never calls `core/` directly for writes — it always goes through `workers/` (enqueue) or `core/` via Depends for read-only endpoints.
+6. `api/` never runs long I/O writes inline — it schedules `workers/*` via `BackgroundTasks` (or uses `Depends` for read-only endpoints).
 
 ---
 
@@ -322,54 +323,77 @@ CREATE TABLE blast_reports (
 
 ---
 
-## 7. ARQ Worker Architecture
+## 7. Background Task Architecture
 
-### Why ARQ?
-- Native `async/await` — same paradigm as FastAPI.
-- Typed job arguments and results.
-- Built-in retry with exponential backoff.
-- No broker protocol complexity (just Redis lists).
+### Why BackgroundTasks?
 
-### Worker Settings
+Jobs are **I/O-bound** (GitHub REST + OpenAI-compatible LLM). FastAPI `BackgroundTasks` runs after the response is sent, on the **same asyncio event loop** as the API.
+
+- **One process / one container** — simpler hackathon deploy (no Redis, no `arq` worker).
+- Native `async/await` — same paradigm as FastAPI and httpx.
+- Enough durability for a demo: accept that **killing the API process loses in-flight jobs**.
+
+Do **not** use BackgroundTasks for CPU-bound work. If multi-instance durable queues become required later, migrate to ARQ/Celery without changing `core/`.
+
+### Concurrency cap
 
 ```python
-# worker.py
-class WorkerSettings:
-    redis_settings = RedisSettings(host="redis", port=6379)
-    functions = [score_pr_task, analyze_pr_task]
-    max_jobs = 5              # concurrent jobs per worker process
-    job_timeout = 300         # 5 minutes (LLM can be slow)
-    max_tries = 3             # auto-retry on transient failure
-    retry_delay = 30          # seconds between retries
+# main.py (app state) or workers/retry.py
+llm_semaphore = asyncio.Semaphore(5)  # max concurrent LLM/scoring jobs
 ```
 
-### Task Definition Example
+Replaces a separate worker `max_jobs` setting. Tune via `LLM_CONCURRENCY` env if needed.
+
+### Task definition example
 
 ```python
 # workers/prioritization.py
-from arq import create_pool
 from app.core.prioritization.service import score_pr
 from app.database import AsyncSessionLocal
+from app.workers.retry import with_io_retry
 
-async def score_pr_task(ctx, pr_id: str, owner: str, repo: str, number: int):
+async def score_pr_task(pr_id: str, owner: str, repo: str, number: int):
+    # New session — never reuse the request's Depends(get_db) session
     async with AsyncSessionLocal() as db:
-        await score_pr(db, pr_id, owner, repo, number)
+        async with llm_semaphore:
+            await with_io_retry(
+                lambda: score_pr(db, pr_id, owner, repo, number),
+                max_tries=3,
+                retry_delay=30,
+            )
 ```
 
-### Enqueue from API
+### Schedule from API
 
 ```python
 # api/webhooks.py
+from fastapi import BackgroundTasks, Depends, Request
+from fastapi.responses import JSONResponse
+
 @router.post("/webhooks/github")
-async def github_webhook(request: Request, redis: Redis = Depends(get_redis_pool)):
-    # ... verify signature ...
-    await redis.enqueue_job(
-        "score_pr_task",
+async def github_webhook(
+    request: Request,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
+    # ... verify signature, upsert PR (status=pending) ...
+    background_tasks.add_task(
+        score_pr_task,
         pr_id=f"{owner}/{repo}#{number}",
-        owner=owner, repo=repo, number=number
+        owner=owner,
+        repo=repo,
+        number=number,
     )
-    return {"accepted": True}
+    return JSONResponse({"accepted": True}, status_code=202)
 ```
+
+### Rules
+
+1. **New DB session inside the task** — the request session is closed after `202`.
+2. **Pass IDs only** (Claim Check) — not full diffs in `add_task` args.
+3. **In-task retry** via `workers/retry.py` (`max_tries=3`, `retry_delay=30`) for LLM/GitHub timeouts.
+4. **Idempotency** on `PR.status` — skip if already `scored` / `analyzed` / terminal.
+5. **Semaphore** caps concurrent LLM calls (default 5).
 
 ---
 
@@ -385,15 +409,16 @@ GitHub
 │  FastAPI (api/webhooks.py)          │
 │  1. Verify HMAC signature           │
 │  2. Upsert PR row (status=pending)  │
-│  3. Enqueue score_pr_task to Redis  │
+│  3. BackgroundTasks.add_task(       │
+│       score_pr_task, pr_id, ...)    │
 │  4. Return 202 Accepted ────────────┼──► GitHub
 └─────────────────────────────────────┘
   │
-  │ Redis queue
+  │ same process (after response)
   ▼
 ┌─────────────────────────────────────┐
-│  ARQ Worker                         │
-│  1. Dequeue score_pr_task           │
+│  workers/prioritization.py          │
+│  1. Open new DB session             │
 │  2. Call core/prioritization/       │
 │     service.score_pr()              │
 │     a. github_client.fetch_diff()   │
@@ -427,14 +452,16 @@ GitHub
   │ (User clicks "Analyze Impact")
   ▼
 ┌─────────────────────────────────────┐
-│  FastAPI (api/prs.py or manual)     │
-│  Enqueue analyze_pr_task ──────────►│──► Redis
+│  FastAPI (api/…/blast-radius)       │
+│  BackgroundTasks.add_task(          │
+│    analyze_pr_task, pr_id) → 202    │
 └─────────────────────────────────────┘
   │
+  │ same process
   ▼
 ┌─────────────────────────────────────┐
-│  ARQ Worker                         │
-│  1. Dequeue analyze_pr_task         │
+│  workers/blast_radius.py            │
+│  1. Open new DB session             │
 │  2. Call core/blast_radius/         │
 │     service.analyze_pr()            │
 │     a. code_parser.parse_diff()     │
@@ -508,29 +535,35 @@ Frontend
 │  3. Return SprintHealthResult       │
 └─────────────────────────────────────┘
 ```
+
 ---
 
-## 9. PostgreSQL + Workers: Mitigation Strategy
+## 9. PostgreSQL + In-Process Tasks: Mitigation Strategy
 
-PostgreSQL handles concurrent writers. ARQ workers run in separate processes. This is the architecture's primary constraint.
+Background tasks share the **same process and engine pool** as FastAPI. There is no multi-process worker fleet in V1.
 
 ### Mitigations Applied
 
 | Technique | Where | Effect |
 |-----------|-------|--------|
-| **MVCC (Multi-Version Concurrency Control)** | `database.py` — `PRAGMA isolation_level=READ_COMMITTED` | Readers do not block writers. Writers do not block readers. |
-| **Busy timeout** | `database.py` — `PRAGMA busy_timeout=5000` | Writer waits up to 5s instead of failing with "connection pool exhausted". |
-| **connection pool for workers** | `database.py` — `poolclass=AsyncAdaptedQueuePool` in worker context | Each job opens a pooled connection. No connection leaks across processes. |
-| **Low worker concurrency** | `WorkerSettings.max_jobs = 5` | Limits simultaneous writers. Scale horizontally (more worker containers) only if PostgreSQL contention is acceptable. |
-| **Claim Check pattern** | ARQ queue carries only `pr_id` | Queue is tiny. Heavy writes (diff cache, scores) happen in PostgreSQL, not Redis. |
-| **Idempotency** | Workers skip if `PR.status` already terminal | Duplicate or retried jobs do not re-write. |
+| **MVCC (Multi-Version Concurrency Control)** | `database.py` — isolation `READ_COMMITTED` | Readers do not block writers. Writers do not block readers. |
+| **Shared async pool** | `database.py` — `AsyncAdaptedQueuePool` | Tasks and request handlers borrow from one pool; no cross-process leaks. |
+| **LLM concurrency semaphore** | `main.py` / `workers/` — default 5 | Caps simultaneous GitHub+LLM jobs and DB writers. |
+| **Claim Check pattern** | `add_task` args = `pr_id` (+ owner/repo/number) | Task args stay tiny. Diffs and scores live in PostgreSQL. |
+| **Idempotency** | Tasks skip if `PR.status` already terminal | Duplicate webhooks / retries do not re-write blindly. |
+| **New session per task** | `workers/*.py` | Avoids using a closed request session after `202`. |
 
-### When to Migrate
+### Known V1 limit
 
-If you observe `connection pool exhausted` errors under load, the path forward is:
-1. Increase PostgreSQL connection pool size in `database.py`.
-2. Increase `max_jobs` and worker replicas.
-3. No changes needed in `core/`, `api/`, `ai/`, or `workers/`.
+If the API process is killed mid-job, that job is **lost** (no Redis ack). Replay the webhook or re-trigger analyze. Acceptable for the hackathon demo.
+
+### When to migrate to a durable queue
+
+If you need multi-instance durability or survive process restarts:
+
+1. Introduce ARQ/Celery + Redis (or equivalent).
+2. Keep `workers/*.py` callables as the job bodies; only change how they are scheduled.
+3. No changes needed in `core/` or agent modules.
 
 ---
 
@@ -577,16 +610,16 @@ GITHUB_TOKEN=ghp_...
 LLM_API_KEY=sk-...
 LLM_BASE_URL=https://api.openai.com/v1
 LLM_MODEL=gpt-4o-mini
+LLM_CONCURRENCY=5
 
 # Database
 DATABASE_URL=postgresql+asyncpg://user:pass@postgres:5432/agentic_team_lead
 
-# Redis (ARQ)
-REDIS_URL=redis://redis:6379
-
 # App
 PORT=8000
 ```
+
+No `REDIS_URL` in V1.
 
 ---
 
@@ -595,10 +628,10 @@ PORT=8000
 | Risk | Symptom | Mitigation |
 |------|---------|------------|
 | Bad webhook secret | Events ignored | `github_client.verify_signature()` → 401. Log raw body for debugging. |
-| LLM timeout / rate limit | PR stuck `pending` | ARQ `max_tries=3`, `retry_delay=30`. Worker marks `error` after exhaustion. |
+| LLM timeout / rate limit | PR stuck `pending` | `with_io_retry(max_tries=3, retry_delay=30)`. Task marks `error` after exhaustion. |
 | LLM schema drift | UI breaks / parse errors | `response_validator` validates with Pydantic. Rejects bad JSON → `error` status. |
-| Connection pool exhausted | `connection pool exhausted` | Connection pooling + MVCC. Monitor logs; increase pool size or add PgBouncer if persistent. |
-| Worker crash mid-job | Job lost in Redis | ARQ retries on next worker start (unacked message). Idempotency prevents double-write. |
+| Connection pool exhausted | `connection pool exhausted` | Connection pooling + MVCC + semaphore. Monitor logs; increase pool size or add PgBouncer if persistent. |
+| API process killed mid-job | Job never finishes | Known V1 limit. Replay webhook / re-POST analyze. Idempotency prevents double-write on retry. |
 | Tunnel / network drop | No live webhook | `POST /webhooks/github` accepts manual replay. Fixtures in `tests/fixtures/` for local dev. |
 
 ---
@@ -607,9 +640,9 @@ PORT=8000
 
 | Decision | Rationale |
 |----------|-----------|
-| **ARQ over Celery** | Asyncio-native, typed, minimal ops. No `kombu`/`billiard` complexity. |
-| **PostgreSQL kept** | Zero infra for demo. MVCC (Multi-Version Concurrency Control) makes it viable for low-concurrency workers. Migration path to Postgres is one engine swap. |
+| **BackgroundTasks over ARQ/Celery** | I/O-bound work only; one deploy unit; no Redis or second process for the hackathon. |
+| **No Redis in V1** | Queue durability not required for demo. Add a durable broker only when multi-instance survival matters. |
+| **PostgreSQL kept** | Shared persistence for PR metadata, diffs, and scores. MVCC + pool + semaphore handle in-process concurrency. |
 | **Modular monolith** | Clean boundaries without microservices overhead. Can extract to services later if needed. |
-| **Redis only for queue** | Not used for caching or state. Keeps architecture simple. |
-| **Claim Check** | ARQ messages carry `pr_id` only. Large payloads (diffs) live in PostgreSQL. |
+| **Claim Check** | Task args carry `pr_id` only. Large payloads (diffs) live in PostgreSQL. |
 | **Agentic architecture** | `orchestrator` + specialized agents mirrors a real team lead structure. New agents (security, review, docs) can be added without touching existing services. |
