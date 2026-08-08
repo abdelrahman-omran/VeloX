@@ -3,7 +3,7 @@
 > Reverse-engineer development from this pitch.  
 > **Feature gate:** if a feature is not required by this script, do not build it.
 
-Product facts: [`_shared/product.yml`](_shared/product.yml) · Agreement: [`01-prd.md`](01-prd.md)
+Product facts: [`_shared/product.yml`](_shared/product.yml) · Agreement: [`01-prd.md`](01-prd.md) · Positioning: [`06-competitors.md`](06-competitors.md)
 
 ---
 
@@ -24,13 +24,13 @@ Product facts: [`_shared/product.yml`](_shared/product.yml) · Agreement: [`01-p
 
 **What the audience sees**
 
-- Team Lead opens the React dashboard.
+- Team Lead opens the React dashboard (morning **triage inbox** metaphor — risk-sorted PR queue, not a separate Action Feed UI).
 - Mock **Sprint Confidence** is already dropping (Predictive Delivery panel — mocked data).
 - Active PR queue shows a few scored PRs; the room understands “delivery is at risk.”
 
 **Spoken beat (suggested)**
 
-> “Our sprint confidence is slipping, but status meetings are always late. Here’s the live engineering signal.”
+> “Our sprint confidence is slipping, but status meetings are always late. Here’s the live engineering triage inbox — not another metrics chart.”
 
 **Owning components**
 
@@ -69,9 +69,9 @@ Product facts: [`_shared/product.yml`](_shared/product.yml) · Agreement: [`01-p
 - AI summary + **blast radius** services (e.g. `auth-service`, `database-schema`) are visible.
 - Optionally: the agent posts a short comment on the GitHub PR with the same summary (nice-to-have if time; not a blocker if UI alone is crisp).
 
-**Spoken beat (suggested)**
+**Spoken beat (suggested) — Impact Chain spine**
 
-> “Risk score, blast radius, and why it matters — generated from the actual diff and CI context, not a spreadsheet.”
+> “Watch the chain: this diff touches auth tokens — micro. Blast radius hits three services. That pressure shows up on sprint confidence — macro. Risk score, blast radius, and why it matters — from the actual diff, not a spreadsheet.”
 
 **Owning components**
 
@@ -79,7 +79,7 @@ Product facts: [`_shared/product.yml`](_shared/product.yml) · Agreement: [`01-p
 | --- | --- |
 | Brain (LLM) | Strict JSON per `llm-output` schema |
 | Engine | Persist score; expose via `GET /api/prs/active` |
-| Glass | Risk badge, summary, blast-radius chips |
+| Glass | Risk badge, summary, blast-radius chips; sprint panel may update (mock) |
 | GitHub API (optional) | Leave PR comment |
 
 ---
@@ -117,6 +117,20 @@ Use this as the only build backlog filter.
 
 ---
 
+## Judge objections (rehearse)
+
+Full Q&A: [`06-competitors.md`](06-competitors.md). Short versions for stage:
+
+### “Isn’t this CodeRabbit / Copilot?”
+
+> They review *lines of code* for developers. We triage *engineering decisions* for Team Leads — blast radius, who should review, sprint pressure. No inline nitpick spam.
+
+### “Isn’t this LinearB?”
+
+> LinearB shows retrospective metrics after the fact. We are code-aware on the incoming PR. Sprint confidence here is a **demo signal** tied to that story — not a full forecasting product.
+
+---
+
 ## Staging prep (day-of)
 
 - [ ] Dummy repo with known “risky” file paths that map to demo services
@@ -124,10 +138,12 @@ Use this as the only build backlog filter.
 - [ ] At least one warm LLM call completed (cold-start avoided on stage)
 - [ ] Dashboard open on projector; fallback: recorded clip of webhook path if network fails
 - [ ] Fixture responses available from [`04-api-contracts/examples/`](04-api-contracts/examples/) if live LLM flakes
+- [ ] Objection answers rehearsed (CodeRabbit / LinearB)
 
 ---
 
 ## Related docs
 
+- [Competitors](06-competitors.md) — gap, matrix, what to say vs skip  
 - [Architecture](03-architecture.md) — data flow for each beat  
 - [API contracts](04-api-contracts/) — shapes the Glass and Brain must honor  

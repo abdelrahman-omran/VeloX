@@ -119,6 +119,8 @@ Copy into the app later as `frontend/src/components/Logo.tsx`.
 
 When judges see the dashboard, it should read as high density and high utility — aligned with the [demo script](02-demo-use-case.md).
 
+**V1 Glass = low-noise triage queue** (risk-sorted PRs + detail + Assign CTA). Pitch slides may call this a “morning triage inbox.” A dedicated **Morning Action Feed** (fast-track / split / descope cards) is a **V2 pattern** from [competitors positioning](06-competitors.md) — do not rebuild the layout for the hackathon.
+
 ```mermaid
 flowchart LR
   Navbar[TopNavbar Logo SprintHealth RepoSwitcher]
