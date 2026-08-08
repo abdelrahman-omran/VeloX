@@ -38,12 +38,12 @@ _shared/product.yml      →  01-prd / 02-demo / 03-architecture  (committed V1 
 
 | Concern | Choice |
 | --- | --- |
-| Product name | Mergent |
+| Product name | VeloX |
 | LLM | OpenAI-compatible API (`LLM_API_KEY`, `LLM_BASE_URL`) |
 | Storage | SQLite (Postgres later) |
 | Frontend | TypeScript / React |
 | Backend | TBD — Go vs Node/TS vs Python (see architecture) |
-| Visual system | Dark-mode Mergent tokens ([`05-brand.md`](05-brand.md)) |
+| Visual system | Dark-mode VeloX tokens ([`05-brand.md`](05-brand.md)) |
 
 ## Rule
 

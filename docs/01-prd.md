@@ -5,7 +5,7 @@
 
 | Field | Value |
 | --- | --- |
-| Product | Mergent |
+| Product | VeloX |
 | Horizon | 3-week hackathon (demo-first) |
 | Status | Draft — pre-code |
 
@@ -13,7 +13,7 @@
 
 ## Elevator Pitch
 
-Mergent is an AI decision-support agent that turns fragmented GitHub and CI/CD activity into real-time delivery visibility for Team Leads. It scores pull-request risk, estimates blast radius, and surfaces mocked sprint-health signals so leaders act before deadlines slip.
+VeloX is an AI decision-support agent that turns fragmented GitHub and CI/CD activity into real-time delivery visibility for Team Leads. It scores pull-request risk, estimates blast radius, and surfaces mocked sprint-health signals so leaders act before deadlines slip.
 
 *(Canonical text: `elevator_pitch` in [`product.yml`](_shared/product.yml).)*
 
@@ -29,7 +29,7 @@ Engineering Team Leads and Managers overseeing ~5–15 developers who are bottle
 
 ## Positioning
 
-Mergent sits in **the gap** between two saturated silos:
+VeloX sits in **the gap** between two saturated silos:
 
 1. **AI PR reviewers** (CodeRabbit-class) — micro, line-by-line, IC-facing; no sprint/system impact.
 2. **Eng management / DORA platforms** (LinearB-class) — macro, retrospective charts; no understanding of the actual diff.

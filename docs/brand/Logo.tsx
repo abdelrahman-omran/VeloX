@@ -11,7 +11,7 @@ export type LogoProps = {
 };
 
 /**
- * Mergent “Focal Branch” lockup — PR branch nodes + foresight prism.
+ * VeloX “Focal Branch” lockup — PR branch nodes + foresight prism.
  * Drop into frontend/src/components/Logo.tsx on Day 1.
  */
 export const Logo: React.FC<LogoProps> = ({
@@ -19,12 +19,12 @@ export const Logo: React.FC<LogoProps> = ({
   showWordmark = true,
   showAiBadge = true,
   className = '',
-  gradientId = 'mergent-grad',
+  gradientId = 'velox-grad',
 }) => {
   return (
     <div
       className={`flex items-center gap-2.5 select-none ${className}`.trim()}
-      aria-label="Mergent"
+      aria-label="VeloX"
     >
       <div className="relative flex items-center justify-center">
         <svg
@@ -78,7 +78,7 @@ export const Logo: React.FC<LogoProps> = ({
       {showWordmark && (
         <div className="flex items-center">
           <span className="font-sans font-bold text-lg tracking-tight text-[#E8EEF6]">
-            Mergent
+            VeloX
           </span>
           {showAiBadge && (
             <span className="ml-1 px-1.5 py-0.5 text-[10px] font-mono font-semibold rounded bg-[#8B97A8]/15 text-[#8B97A8] border border-[#8B97A8]/25">

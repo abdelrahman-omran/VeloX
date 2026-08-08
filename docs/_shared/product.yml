@@ -1,12 +1,12 @@
 # Single source of truth for product facts.
 # Edit this file first; PRD / demo / architecture reference it.
 
-name: Mergent
-slug: mergent
+name: VeloX
+slug: velox
 tagline: Engineering Intelligence Before the Merge.
 
 elevator_pitch: >
-  Mergent is an AI decision-support agent that turns fragmented GitHub and CI/CD activity
+  VeloX is an AI decision-support agent that turns fragmented GitHub and CI/CD activity
   into real-time delivery visibility for Team Leads. It scores pull-request risk, estimates
   blast radius, and surfaces mocked sprint-health signals so leaders act before deadlines slip.
 
