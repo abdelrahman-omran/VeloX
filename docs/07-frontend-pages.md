@@ -1,10 +1,10 @@
-# Frontend pages (Glass)
+# Frontend pages (Glass + marketing)
 
 > Product demo gate remains [`02-demo-use-case.md`](02-demo-use-case.md).  
 > Brand layout for triage: [`05-brand.md`](05-brand.md) §5.  
 > Implementation: [`../frontend/`](../frontend/).
 
-Page map for the React app. Keeps the hackathon **triage inbox** as the primary surface while documenting the small product shell around it.
+Page map for the React app: marketing entry at `/`, Glass product shell under `/app`.
 
 ---
 
@@ -12,23 +12,27 @@ Page map for the React app. Keeps the hackathon **triage inbox** as the primary 
 
 | Route | Page | Role |
 | --- | --- | --- |
-| `/` | Glass Triage | Risk-sorted PR queue + detail + sprint confidence (demo P0) |
+| `/` | Marketing landing | Brand hero, gap thesis, impact chain, CTAs |
+| `/login` | Mock login | Placeholder auth → toast → `/app` |
+| `/signup` | Mock signup | Placeholder auth → toast → `/app` |
+| `/app` | Glass Triage | Risk-sorted PR queue + detail + sprint confidence (demo P0) |
 | `/connect` | Link project | Paste `owner/repo`, webhook checklist; local project store |
 | `/projects` | Projects | List / activate / remove linked repos |
 | `/prs/:id` | PR deep link | Same Glass layout; preselects scored PR |
-| `/?pr=` | Query deep link | Same as `/prs/:id` via search param |
-| `*` | Not found | Minimal 404 → triage |
+| `/?pr=` on `/app` | Query deep link | Use `/app?pr=` (or `/prs/:id`) |
+| `*` | Not found | Links to home + Glass |
 
 ---
 
-## Explicitly not routes (V2 / out of scope)
+## Explicitly deferred (V2 / out of scope)
 
 | Idea | Why deferred |
 | --- | --- |
-| `/inbox` Morning Action Feed | V2 ([06-competitors.md](06-competitors.md)); brand forbids rebuild for hackathon |
-| `/login`, `/settings`, `/billing` | Multi-org SaaS auth kill-listed in PRD |
-| Marketing landing | Pitch deck / brand kit — not an app surface |
+| `/inbox` Morning Action Feed | V2 ([06-competitors.md](06-competitors.md)) |
+| Real auth / settings / billing | Multi-org SaaS auth kill-listed in PRD |
 | Full-screen blast graph | Keep tree inside PR detail |
+
+Auth on `/login` and `/signup` is **mocked** for the hackathon — no tokens, no account persistence.
 
 ---
 
@@ -56,13 +60,17 @@ Webhook secrets stay in Engine env — `/connect` only documents `POST /webhooks
 
 ---
 
-## Flow
+## Flows
 
 ```text
-Cold start (no active project)
-  → / empty queue + “Link a project”
+Marketing
+  → / Open Glass → /signup (mock) → /app triage
+  → Skip to demo dashboard → /app
+
+Cold start in Glass (no active project)
+  → /app empty queue + “Link a project”
   → /connect Save project
-  → / triage (fixtures filtered to active repo)
+  → /app triage (fixtures filtered to active repo)
 ```
 
 Navbar repo switcher reads the same store; **Manage projects** → `/projects`.

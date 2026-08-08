@@ -101,3 +101,33 @@ body {
 .animate-row-highlight {
   animation: row-highlight 1.6s ease-out;
 }
+
+@keyframes hero-panel {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes chain-step {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-hero-panel {
+  animation: hero-panel 200ms ease-out both;
+}
+
+.animate-chain-step {
+  animation: chain-step 250ms ease-out both;
+}

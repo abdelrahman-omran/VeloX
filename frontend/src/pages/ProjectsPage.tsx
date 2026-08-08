@@ -77,7 +77,7 @@ export function ProjectsPage() {
                         className="min-h-9 px-3 py-1.5 text-xs"
                         onClick={() => {
                           setActiveProject(project.id);
-                          void navigate('/');
+                          void navigate('/app');
                         }}
                       >
                         Open triage

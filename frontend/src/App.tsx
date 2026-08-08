@@ -1,6 +1,6 @@
-import { TriagePage } from './pages/TriagePage';
+import { LandingPage } from './pages/LandingPage';
 
-/** Root route entry — Glass triage inbox. */
+/** Root route — marketing landing. Glass lives at /app. */
 export default function App() {
-  return <TriagePage />;
+  return <LandingPage />;
 }

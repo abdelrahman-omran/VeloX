@@ -34,7 +34,7 @@ export function ConnectPage() {
     try {
       linkProject(parsed.data, 'pending');
       pushToast(`Linked ${parsed.data}`);
-      void navigate('/');
+      void navigate('/app');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not link project');
     }
@@ -124,7 +124,7 @@ export function ConnectPage() {
             <Button type="submit" variant="primary">
               Save project
             </Button>
-            <Link to="/" className="text-sm text-velox-muted hover:text-velox-text">
+            <Link to="/app" className="text-sm text-velox-muted hover:text-velox-text">
               Cancel
             </Link>
             <Link to="/projects" className="text-sm text-velox-brand hover:text-velox-hover">

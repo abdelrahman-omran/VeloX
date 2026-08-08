@@ -47,7 +47,7 @@ export function AppShell({
 
       <header className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 border-b border-velox-border bg-velox-card px-4 py-3">
         <div className="justify-self-start">
-          <Link to="/" className="inline-flex rounded-md focus-visible:outline-offset-4">
+          <Link to="/app" className="inline-flex rounded-md focus-visible:outline-offset-4">
             <Logo size={28} />
           </Link>
         </div>

@@ -9,8 +9,10 @@ import './index.css';
 import App from './App.tsx';
 import { ToastProvider } from './components/ui/Toast';
 import { ConnectPage } from './pages/ConnectPage';
+import { LoginPage } from './pages/LoginPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { ProjectsPage } from './pages/ProjectsPage';
+import { SignupPage } from './pages/SignupPage';
 import { TriagePage } from './pages/TriagePage';
 
 const queryClient = new QueryClient({
@@ -29,6 +31,9 @@ createRoot(document.getElementById('root')!).render(
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<App />} />
+            <Route path="/app" element={<TriagePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
             <Route path="/connect" element={<ConnectPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/prs/:id" element={<TriagePage />} />

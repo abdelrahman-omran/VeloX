@@ -19,14 +19,14 @@ export function NotFoundPage() {
         <p className="font-mono text-sm text-velox-muted">404</p>
         <h1 className="mt-2 text-2xl font-bold text-velox-text">Page not found</h1>
         <p className="mt-2 text-sm text-velox-muted">
-          That route isn’t part of VeloX Glass. Head back to the triage inbox.
+          That route isn’t part of VeloX. Head back to the site or open Glass.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Link to="/">
-            <Button variant="primary">Open triage</Button>
+            <Button variant="secondary">Home</Button>
           </Link>
-          <Link to="/projects">
-            <Button variant="secondary">Projects</Button>
+          <Link to="/app">
+            <Button variant="primary">Open Glass</Button>
           </Link>
         </div>
       </div>

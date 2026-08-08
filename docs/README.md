@@ -17,7 +17,7 @@ Ultra-lean hackathon kit. Read these before writing code. Skim order: **Explorat
 | 4 | [`04-api-contracts/`](04-api-contracts/) | REST endpoints + JSON Schemas + examples |
 | 5 | [`05-brand.md`](05-brand.md) | Identity, colors, typography, logo, dashboard theme |
 | 6 | [`06-competitors.md`](06-competitors.md) | Gap thesis, matrix, objections, Demo/Pitch/V2 focus |
-| 7 | [`07-frontend-pages.md`](07-frontend-pages.md) | Glass routes: triage, link project, projects, deep links |
+| 7 | [`07-frontend-pages.md`](07-frontend-pages.md) | Landing, mock auth, Glass routes (triage, link project) |
 
 ## How to edit (modular model)
 

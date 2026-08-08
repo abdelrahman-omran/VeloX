@@ -80,7 +80,7 @@ export function RepoSwitcher({
                 onClick={() => {
                   onSelect(project.id);
                   setOpen(false);
-                  void navigate('/');
+                  void navigate('/app');
                 }}
               >
                 <span>{project.full_name}</span>

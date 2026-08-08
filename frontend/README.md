@@ -1,6 +1,6 @@
 # VeloX Glass (frontend)
 
-React triage dashboard for Team Leads — risk-sorted PR queue, AI summary, blast radius, recommended reviewers, and mocked sprint confidence.
+Marketing landing + React triage dashboard for Team Leads — risk-sorted PR queue, AI summary, blast radius, recommended reviewers, and mocked sprint confidence.
 
 ## Stack
 
@@ -8,7 +8,7 @@ React triage dashboard for Team Leads — risk-sorted PR queue, AI summary, blas
 - Tailwind CSS v4 (VeloX tokens)
 - Zod (API response validation)
 - TanStack Query (polling)
-- React Router (single `/` route)
+- React Router
 
 ## Develop
 
@@ -18,7 +18,7 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:5173
+Open http://localhost:5173 — landing at `/`, Glass at `/app`.
 
 ### Env
 
@@ -31,7 +31,7 @@ Set `VITE_USE_FIXTURES=false` once the FastAPI Engine serves `GET /api/prs/activ
 
 ## Scripts
 
-- `npm run dev` — local Glass with HMR
+- `npm run dev` — local app with HMR
 - `npm run build` — production bundle
 - `npm run preview` — serve the build
 - `npm run lint` — oxlint
@@ -42,9 +42,11 @@ Routes (see [`docs/07-frontend-pages.md`](../docs/07-frontend-pages.md)):
 
 | Path | Page |
 | --- | --- |
-| `/` | Triage inbox |
+| `/` | Marketing landing |
+| `/login` · `/signup` | Mock auth → `/app` |
+| `/app` | Triage inbox |
 | `/connect` | Link project |
 | `/projects` | Manage projects |
 | `/prs/:id` | Deep-linked PR |
 
-Top navbar (Logo · Sprint confidence · Repo switcher) → left priority queue → center PR intelligence.
+Glass chrome: Top navbar (Logo · Sprint confidence · Repo switcher) → left priority queue → center PR intelligence.
