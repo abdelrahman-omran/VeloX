@@ -1,18 +1,34 @@
 # Single source of truth for product facts.
 # Edit this file first; PRD / demo / architecture reference it.
 
-name: Agentic Team Lead Assistant
-slug: agentic-team-lead-assistant
-tagline: AI-powered decision support that connects GitHub delivery signals to Team Lead action.
+name: VeloX
+slug: velox
+tagline: Engineering Intelligence Before the Merge.
 
 elevator_pitch: >
-  An AI decision-support agent that turns fragmented GitHub and CI/CD activity into
-  real-time delivery visibility for Team Leads. It scores pull-request risk, estimates
+  VeloX is an AI decision-support agent that turns fragmented GitHub and CI/CD activity
+  into real-time delivery visibility for Team Leads. It scores pull-request risk, estimates
   blast radius, and surfaces mocked sprint-health signals so leaders act before deadlines slip.
 
 target_audience: >
   Engineering Team Leads and Managers overseeing ~5–15 developers who are bottlenecked
   by manual PR triage, stale status meetings, and disconnected engineering vs. planning tools.
+
+positioning:
+  gap: >
+    Bridges code-level PR risk/blast radius with Team Lead delivery triage
+    (not IC line review, not exec DORA).
+  primary_antagonists:
+    - CodeRabbit-class AI PR reviewers
+    - LinearB-class eng metrics platforms
+  differentiators_v1:
+    - micro_to_macro_story
+    - blast_radius_narrative
+    - triage_not_inline_noise
+  differentiators_v2:
+    - morning_action_feed
+    - workload_aware_reviewer_routing
+    - real_predictive_sprint_model
 
 success_metrics:
   - Working GitHub webhook that ingests PR events from a demo repo on stage
@@ -51,6 +67,8 @@ out_scope:
   - Custom trained ML models
   - Jira or other PM-tool integration
   - Real predictive analytics / forecasting models (mock metrics in UI only)
+  - Line-by-line / inline PR nitpick review (CodeRabbit-class AI PR review)
+  - Real DORA / cycle-time analytics platform (LinearB-class eng metrics)
   - Multi-org SaaS auth, billing, or RBAC beyond a simple demo mode
   - Production-grade HA, multi-region, or formal compliance controls
 

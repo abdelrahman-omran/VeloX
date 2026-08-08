@@ -5,7 +5,7 @@
 
 | Field | Value |
 | --- | --- |
-| Product | Agentic Team Lead Assistant |
+| Product | VeloX |
 | Horizon | 3-week hackathon (demo-first) |
 | Status | Draft — pre-code |
 
@@ -13,7 +13,7 @@
 
 ## Elevator Pitch
 
-An AI decision-support agent that turns fragmented GitHub and CI/CD activity into real-time delivery visibility for Team Leads. It scores pull-request risk, estimates blast radius, and surfaces mocked sprint-health signals so leaders act before deadlines slip.
+VeloX is an AI decision-support agent that turns fragmented GitHub and CI/CD activity into real-time delivery visibility for Team Leads. It scores pull-request risk, estimates blast radius, and surfaces mocked sprint-health signals so leaders act before deadlines slip.
 
 *(Canonical text: `elevator_pitch` in [`product.yml`](_shared/product.yml).)*
 
@@ -27,9 +27,22 @@ Engineering Team Leads and Managers overseeing ~5–15 developers who are bottle
 
 ---
 
+## Positioning
+
+VeloX sits in **the gap** between two saturated silos:
+
+1. **AI PR reviewers** (CodeRabbit-class) — micro, line-by-line, IC-facing; no sprint/system impact.
+2. **Eng management / DORA platforms** (LinearB-class) — macro, retrospective charts; no understanding of the actual diff.
+
+We bridge **code-level risk + blast radius** with **Team Lead delivery triage** — low-noise decisions, not inline nitpicks or exec dashboards.
+
+*(Canonical: `positioning` in [`product.yml`](_shared/product.yml). Full matrix & objections: [`06-competitors.md`](06-competitors.md).)*
+
+---
+
 ## Problem (why this exists)
 
-Modern teams generate engineering signal in GitHub, CI/CD, and trackers, but that data stays fragmented. Team Leads lack real-time delivery visibility, struggle to spot high-impact PRs, discover delivery risk late, and operate with a gap between engineering progress and business planning. The result: review bottlenecks, slow decisions, and reactive planning.
+Modern teams generate engineering signal in GitHub, CI/CD, and trackers, but that data stays fragmented across those two silos. Team Leads lack real-time delivery visibility, struggle to spot high-impact PRs, discover delivery risk late, and operate with a gap between engineering progress and business planning. The result: review bottlenecks, slow decisions, and reactive planning.
 
 ---
 
@@ -80,6 +93,8 @@ Canonical list: `out_scope` in [`product.yml`](_shared/product.yml). Summary:
 - Custom ML models
 - Jira / PM-tool integration
 - Real predictive analytics (mock UI only)
+- Line-by-line / inline PR nitpick review (CodeRabbit space)
+- Real DORA / cycle-time analytics platform (LinearB space)
 - Multi-org SaaS auth, billing, heavy RBAC
 - Production HA / multi-region / formal compliance
 
@@ -99,6 +114,7 @@ Canonical list: `out_scope` in [`product.yml`](_shared/product.yml). Summary:
 | Doc | Role |
 | --- | --- |
 | [Exploration](00-exploration.md) | Broader users/use cases (do not treat as V1 scope) |
+| [Competitors](06-competitors.md) | Gap thesis, matrix, objections, Demo/Pitch/V2 tips |
 | [Demo use case](02-demo-use-case.md) | Feature gate for every build decision |
 | [Architecture](03-architecture.md) | Boxes, arrows, stack TBD |
 | [API contracts](04-api-contracts/) | JSON shapes between LLM, backend, and UI |
