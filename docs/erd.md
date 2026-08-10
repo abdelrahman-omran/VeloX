@@ -181,20 +181,20 @@ Each table is owned by exactly one module. No module writes to another module's 
 
 ## Table Specifications
 
-Detailed column definitions, JSONB structures, constraints, and indexes for every table are documented in [`schema.md`](schema.md).
+Detailed column definitions, JSONB structures, constraints, and indexes for every table are documented in [`schema.md`](./schema.md).
 
 | Table | Section in schema.md |
-|-------|---------------------|
-| `repositories` | [repositories](#repositories) |
-| `prs` | [prs — Shared Kernel](#prs--shared-kernel) |
-| `priority_scores` | [priority_scores — Prioritization Module](#priority_scores--prioritization-module) |
-| `blast_reports` | [blast_reports — Blast Radius Module](#blast_reports--blast-radius-module) |
-| `pr_files` | [pr_files — Blast Radius File Breakdown](#pr_files--blast-radius-file-breakdown) |
-| `sprint_forecasts` | [sprint_forecasts — Sprint Forecast Module](#sprint_forecasts--sprint-forecast-module) |
-| `sprint_prs` | [sprint_prs — Sprint to PR Junction](#sprint_prs--sprint-to-pr-junction) |
-| `ai_runs` | [ai_runs — AI Execution History](#ai_runs--ai-execution-history) |
-| `agent_configs` | [agent_configs — User-Configurable AI Settings](#agent_configs--user-configurable-ai-settings) |
-| `job_logs` | [job_logs — Background Task Observability](#job_logs--background-task-observability) |
+|---|---|
+| `repositories` | [repositories](./schema.md#repositories) |
+| `prs` | [prs — Shared Kernel](./schema.md#prs--shared-kernel) |
+| `priority_scores` | [priority_scores — Prioritization Module](./schema.md#priority_scores--prioritization-module) |
+| `blast_reports` | [blast_reports — Blast Radius Module](./schema.md#blast_reports--blast-radius-module) |
+| `pr_files` | [pr_files — Blast Radius File Breakdown](./schema.md#pr_files--blast-radius-file-breakdown) |
+| `sprint_forecasts` | [sprint_forecasts — Sprint Forecast Module](./schema.md#sprint_forecasts--sprint-forecast-module) |
+| `sprint_prs` | [sprint_prs — Sprint to PR Junction](./schema.md#sprint_prs--sprint-to-pr-junction) |
+| `ai_runs` | [ai_runs — AI Execution History](./schema.md#ai_runs--ai-execution-history) |
+| `agent_configs` | [agent_configs — User-Configurable AI Settings](./schema.md#agent_configs--user-configurable-ai-settings) |
+| `job_logs` | [job_logs — Background Task Observability](./schema.md#job_logs--background-task-observability) |
 
 ---
 
