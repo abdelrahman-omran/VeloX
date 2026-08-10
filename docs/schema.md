@@ -77,6 +77,8 @@ Central registry for every pull request ingested via GitHub webhook.
 | `title` | `TEXT` | | PR title |
 | `author` | `TEXT` | | GitHub username |
 | `branch` | `TEXT` | | Source branch |
+| `head_sha` | `TEXT` | | Latest commit SHA on the PR branch (updated on every webhook) |
+| `base_sha` | `TEXT` | | Target branch commit SHA at PR creation |
 | `diff_text` | `TEXT` | | Cached raw diff blob (MVP) |
 | `status` | `pr_status` | `DEFAULT 'pending'` | Pipeline state |
 | `created_at` | `TIMESTAMPTZ` | `DEFAULT now()` | First seen |
@@ -327,7 +329,7 @@ Lightweight tracking for FastAPI BackgroundTasks. Handles idempotency, deduplica
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
 | `id` | `SERIAL` | **PK** | Log entry ID |
-| `idempotency_key` | `TEXT` | **UQ** | Dedupe key: `{job_type}:{entity_type}:{entity_id}` (e.g., `score_pr:pr:42`) |
+| `idempotency_key` | `TEXT` | **UQ** | Dedupe key: `{job_type}:{entity_type}:{entity_id}:head:{sha}` (e.g., `score_pr:pr:42:head:abc123def`). Includes `head_sha` so `synchronize` events re-queue. |
 | `correlation_id` | `TEXT` | | Same value across all retries of the same logical job |
 | `job_type` | `job_type` | `NOT NULL` | `score_pr` / `analyze_pr` / `forecast_sprint` |
 | `entity_type` | `TEXT` | | Target entity class: `pr`, `sprint` |
@@ -354,9 +356,10 @@ Lightweight tracking for FastAPI BackgroundTasks. Handles idempotency, deduplica
 **Usage patterns:**
 
 ```
--- Prevent duplicate enqueue
+-- Prevent duplicate enqueue for the SAME commit
+-- Include head_sha so synchronize events (new commits) re-queue naturally
 INSERT INTO job_logs (idempotency_key, job_type, entity_type, entity_id, status)
-VALUES ('score_pr:pr:42', 'score_pr', 'pr', '42', 'pending')
+VALUES ('score_pr:pr:42:head:abc123def', 'score_pr', 'pr', '42', 'pending')
 ON CONFLICT (idempotency_key) DO NOTHING;
 
 -- Find stuck jobs (running longer than expected)
