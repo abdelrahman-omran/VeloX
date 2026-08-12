@@ -1,7 +1,7 @@
 """Shared Pydantic DTOs."""
 
 from datetime import datetime
-
+from typing import Optional
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -63,7 +63,13 @@ class PriorityScoreBase(BaseModel):
 
 
 class PRWithScore(PRBase):
-    score: PriorityScoreBase | None = None
+    """PR joined with its priority score."""
+
+    score: Optional[PriorityScoreBase] = None
+
+    model_config = ConfigDict(
+        from_attributes=True
+    )
 
 
 # ─────────────────────────────────────────────
@@ -131,6 +137,9 @@ class JobLogBase(BaseModel):
 # ─────────────────────────────────────────────
 # API Request / Response Schemas
 # ─────────────────────────────────────────────
+class ScorePRRequest(BaseModel):
+    """Request body for POST /api/prs/{id}/score."""
+    pass
 
 class ScorePRResponse(BaseModel):
     pr_id: int

@@ -1,64 +1,42 @@
 """PR API endpoints."""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import List
+
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from app.common.models import PR
 from app.common.schemas import (
+    PRBase,
     PRDetail,
     PRWithScore,
+    ScorePRRequest,
     ScorePRResponse,
 )
+from app.core.prioritization.service import score_pr
 from app.dependencies import get_db_session
+
 
 router = APIRouter()
 
 
-@router.get(
-    "/active",
-    response_model=list[PRWithScore],
-)
+@router.get("/active", response_model=List[PRWithScore])
 async def list_active_prs(
     db: AsyncSession = Depends(get_db_session),
 ):
-    """List active PRs with their latest priority scores."""
+    """List all active PRs with their latest priority scores."""
 
     result = await db.execute(
         select(PR)
-        .options(selectinload(PR.priority_score))
         .where(PR.status != "error")
         .order_by(PR.created_at.desc())
     )
 
-    prs = result.scalars().all()
-
-    return [
-        {
-            **{
-                "id": pr.id,
-                "repo": pr.repo,
-                "number": pr.number,
-                "title": pr.title,
-                "author": pr.author,
-                "branch": pr.branch,
-                "head_sha": pr.head_sha,
-                "base_sha": pr.base_sha,
-                "status": pr.status,
-                "created_at": pr.created_at,
-                "updated_at": pr.updated_at,
-            },
-            "score": pr.priority_score,
-        }
-        for pr in prs
-    ]
+    return result.scalars().all()
 
 
-@router.get(
-    "/{pr_id}",
-    response_model=PRDetail,
-)
+@router.get("/{pr_id}", response_model=PRDetail)
 async def get_pr(
     pr_id: int,
     db: AsyncSession = Depends(get_db_session),
@@ -73,7 +51,7 @@ async def get_pr(
 
     if not pr:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="PR not found",
         )
 
@@ -87,13 +65,14 @@ async def get_pr(
 )
 async def score_pr_endpoint(
     pr_id: int,
+    request: ScorePRRequest,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db_session),
 ):
     """
-    Queue priority scoring for a PR.
+    Queue PR scoring as a background task.
 
-    Actual worker/queue integration will be added
-    in the background-job phase.
+    The actual AI workflow runs after the HTTP response is returned.
     """
 
     result = await db.execute(
@@ -104,9 +83,21 @@ async def score_pr_endpoint(
 
     if not pr:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="PR not found",
         )
+
+    if pr.status == "scored":
+        return ScorePRResponse(
+            pr_id=pr.id,
+            status="already_scored",
+            message=f"PR #{pr.number} has already been scored.",
+        )
+
+    if pr.status == "pending":
+        pr.status = "pending"
+
+    background_tasks.add_task(score_pr, pr.id)
 
     return ScorePRResponse(
         pr_id=pr.id,
