@@ -47,6 +47,29 @@ async def test_analyze_returns_valid_result(agent):
 
 
 @pytest.mark.asyncio
+async def test_analyze_strips_markdown_fences(agent):
+    """Gemini often wraps JSON in ```json fences — we strip them."""
+    agent.llm_client.generate = AsyncMock(
+        return_value="```json\n"
+        + json.dumps(
+            {
+                "overall_score": 55,
+                "readability": 60,
+                "security": 50,
+                "performance": 55,
+                "architecture": 60,
+                "reasoning": "Wrapped in markdown.",
+            }
+        )
+        + "\n```"
+    )
+
+    result = await agent.analyze("owner/repo", "Fix auth", "diff...")
+    assert result.overall_score == 55
+    assert result.reasoning == "Wrapped in markdown."
+
+
+@pytest.mark.asyncio
 async def test_analyze_invalid_json_raises_value_error(agent):
     """Non-JSON response raises ValueError."""
     agent.llm_client.generate = AsyncMock(return_value="not json at all")

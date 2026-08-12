@@ -1,6 +1,7 @@
 """AI agent responsible for PR prioritization."""
 
 import json
+import re
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -24,6 +25,15 @@ class PrioritizationAgent:
 
     def __init__(self, llm_client: LLMClient) -> None:
         self.llm_client = llm_client
+
+    def _extract_json(self, raw: str) -> str:
+        """Strip markdown fences and extract the inner JSON string."""
+        raw = raw.strip()
+        # Match ```json ... ``` or ``` ... ```
+        match = re.search(r"```(?:json)?\s*(.*?)```", raw, re.DOTALL)
+        if match:
+            return match.group(1).strip()
+        return raw
 
     async def analyze(
         self,
@@ -74,8 +84,10 @@ PR diff:
             user_prompt=user_prompt,
         )
 
+        cleaned = self._extract_json(raw_response)
+
         try:
-            data: dict[str, Any] = json.loads(raw_response)
+            data: dict[str, Any] = json.loads(cleaned)
         except json.JSONDecodeError as exc:
             raise ValueError(
                 "LLM returned invalid JSON"

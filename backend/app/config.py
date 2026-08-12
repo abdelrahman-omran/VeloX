@@ -8,8 +8,8 @@ class Settings(BaseSettings):
     github_webhook_secret: str = ""
     github_token: str = ""
 
-    # OpenAI
-    openai_api_key: str = ""
+    # LLM (Gemini)
+    gemini_api_key: str = ""
 
     # Database
     database_url: str = "postgresql+asyncpg://user:pass@localhost:5432/velox"

@@ -15,8 +15,8 @@ pytestmark = pytest.mark.integration
     reason="Set RUN_INTEGRATION_TESTS=1 to run integration tests",
 )
 @pytest.mark.asyncio
-async def test_real_openai_prioritization():
-    """End-to-end agent test with real OpenAI API."""
+async def test_real_gemini_prioritization():
+    """End-to-end agent test with real Gemini API."""
     from app.core.ai.llm.llm_client import LLMClient
     from app.core.ai.agents.prioritization_agent import PrioritizationAgent
 

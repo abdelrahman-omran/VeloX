@@ -1,4 +1,4 @@
-"""LLM client abstraction for AI agents."""
+"""LLM client abstraction for AI agents — Gemini adapter."""
 
 from typing import Any
 
@@ -8,47 +8,47 @@ from app.config import settings
 
 
 class LLMClient:
-    """Simple OpenAI-compatible LLM client."""
+    """Simple Google Gemini-compatible LLM client."""
 
     def __init__(self) -> None:
-        self.api_key = settings.openai_api_key
-        self.base_url = "https://api.openai.com/v1"
-        self.model = "gpt-4o-mini"
+        self.api_key = settings.gemini_api_key
+        self.base_url = "https://generativelanguage.googleapis.com/v1beta"
+        self.model = "gemini-3.6-flash"
 
     async def generate(
         self,
         system_prompt: str,
         user_prompt: str,
     ) -> str:
-        """Send a prompt to the LLM and return the text response."""
+        """Send a prompt to Gemini and return the text response."""
 
         if not self.api_key:
-            raise RuntimeError("OPENAI_API_KEY is not configured")
-
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json",
-        }
+            raise RuntimeError("GEMINI_API_KEY is not configured")
 
         payload: dict[str, Any] = {
-            "model": self.model,
-            "messages": [
-                {
-                    "role": "system",
-                    "content": system_prompt,
-                },
+            "systemInstruction": {
+                "parts": [{"text": system_prompt}],
+            },
+            "contents": [
                 {
                     "role": "user",
-                    "content": user_prompt,
-                },
+                    "parts": [{"text": user_prompt}],
+                }
             ],
-            "temperature": 0.0,
+            "generationConfig": {
+                "temperature": 0.0,
+            },
         }
+
+        url = (
+            f"{self.base_url}/models/{self.model}:generateContent"
+            f"?key={self.api_key}"
+        )
 
         async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.post(
-                f"{self.base_url}/chat/completions",
-                headers=headers,
+                url,
+                headers={"Content-Type": "application/json"},
                 json=payload,
             )
 
@@ -56,4 +56,9 @@ class LLMClient:
 
         data = response.json()
 
-        return data["choices"][0]["message"]["content"]
+        try:
+            return data["candidates"][0]["content"]["parts"][0]["text"]
+        except (KeyError, IndexError) as exc:
+            raise ValueError(
+                f"Unexpected Gemini response shape: {data}"
+            ) from exc
