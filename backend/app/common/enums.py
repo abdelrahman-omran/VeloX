@@ -3,7 +3,7 @@ from enum import Enum
 
 
 class PRStatus(str, Enum):
-    pending = "pending"
+    scoring = "scoring"
     scored = "scored"
     analyzed = "analyzed"
     error = "error"

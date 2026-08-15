@@ -25,7 +25,7 @@ async def test_analyze_returns_valid_result(agent):
     agent.llm_client.generate = AsyncMock(
         return_value=json.dumps(
             {
-                "overall_score": 87,
+                "risk_score": 87,
                 "readability": 90,
                 "security": 85,
                 "performance": 80,
@@ -38,7 +38,7 @@ async def test_analyze_returns_valid_result(agent):
     result = await agent.analyze("owner/repo", "Fix auth", "diff...")
 
     assert isinstance(result, PriorityScoreResult)
-    assert result.overall_score == 87
+    assert result.risk_score == 87
     assert result.readability == 90
     assert result.security == 85
     assert result.performance == 80
@@ -53,7 +53,7 @@ async def test_analyze_strips_markdown_fences(agent):
         return_value="```json\n"
         + json.dumps(
             {
-                "overall_score": 55,
+                "risk_score": 55,
                 "readability": 60,
                 "security": 50,
                 "performance": 55,
@@ -65,7 +65,7 @@ async def test_analyze_strips_markdown_fences(agent):
     )
 
     result = await agent.analyze("owner/repo", "Fix auth", "diff...")
-    assert result.overall_score == 55
+    assert result.risk_score == 55
     assert result.reasoning == "Wrapped in markdown."
 
 
@@ -84,7 +84,7 @@ async def test_analyze_out_of_range_score_raises_validation_error(agent):
     agent.llm_client.generate = AsyncMock(
         return_value=json.dumps(
             {
-                "overall_score": 150,
+                "risk_score": 150,
                 "readability": 90,
                 "security": 85,
                 "performance": 80,
@@ -104,7 +104,7 @@ async def test_analyze_missing_field_raises_validation_error(agent):
     agent.llm_client.generate = AsyncMock(
         return_value=json.dumps(
             {
-                "overall_score": 50,
+                "risk_score": 50,
                 "readability": 50,
                 "security": 50,
                 "performance": 50,
