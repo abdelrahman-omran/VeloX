@@ -11,14 +11,14 @@ import app.database
 
 @pytest.mark.asyncio
 async def test_list_active_prs(client):
-    """GET /api/prs/active returns non-error PRs."""
+    """GET /api/prs/active returns {items: [...]} with Glass shape."""
     async with app.database.AsyncSessionLocal() as db:
         pr1 = PR(
             github_pr_id=1001,
             repo="a/b",
             number=1,
             title="T1",
-            status="pending",
+            status="scoring",
         )
         pr2 = PR(
             github_pr_id=1002,
@@ -36,18 +36,23 @@ async def test_list_active_prs(client):
         )
         db.add_all([pr1, pr2, pr3])
         await db.commit()
-        # refresh to get internal ids
-        await db.refresh(pr1)
-        await db.refresh(pr2)
-        await db.refresh(pr3)
-        active_ids = {pr1.id, pr2.id}
 
     response = await client.get("/api/prs/active")
     assert response.status_code == 200
     data = response.json()
-    assert len(data) == 2
-    returned_ids = {p["id"] for p in data}
-    assert returned_ids == active_ids
+    assert "items" in data
+    assert len(data["items"]) == 2
+    ids = {p["id"] for p in data["items"]}
+    assert ids == {"a/b#1", "a/b#2"}
+    for item in data["items"]:
+        assert "risk_score" in item
+        assert "readability" in item
+        assert "security" in item
+        assert "performance" in item
+        assert "architecture" in item
+        assert "reasoning" in item
+        assert "html_url" in item
+        assert item["status"] in ("scoring", "scored", "error")
 
 
 @pytest.mark.asyncio
@@ -59,7 +64,7 @@ async def test_get_pr_found(client):
             repo="a/b",
             number=5,
             title="Found",
-            status="pending",
+            status="scoring",
         )
         db.add(pr)
         await db.commit()
@@ -78,6 +83,7 @@ async def test_get_pr_not_found(client):
     """GET /api/prs/{id} returns 404 for missing PR."""
     response = await client.get("/api/prs/999999")
     assert response.status_code == 404
+    assert response.json()["error"]["message"] == "PR not found"
 
 
 @pytest.mark.asyncio
@@ -106,6 +112,7 @@ async def test_score_pr_not_found(client):
     """POST /score for nonexistent PR returns 404."""
     response = await client.post("/api/prs/999999/score", json={})
     assert response.status_code == 404
+    assert response.json()["error"]["message"] == "PR not found"
 
 
 @pytest.mark.asyncio
@@ -117,7 +124,7 @@ async def test_score_pr_endpoint(client):
             repo="owner/repo",
             number=10,
             title="Test PR",
-            status="pending",
+            status="scoring",
         )
         db.add(pr)
         await db.commit()

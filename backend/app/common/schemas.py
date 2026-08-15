@@ -20,6 +20,7 @@ class PRBase(BaseModel):
     branch: str | None = None
     head_sha: str | None = None
     base_sha: str | None = None
+    html_url: str | None = None
     status: str
     created_at: datetime
     updated_at: datetime
@@ -34,6 +35,7 @@ class PRCreate(BaseModel):
     head_sha: str | None = None
     base_sha: str | None = None
     github_pr_id: int
+    html_url: str | None = None
 
 
 class PRDetail(PRBase):
@@ -49,14 +51,13 @@ class PriorityScoreBase(BaseModel):
 
     pr_id: int
 
-    overall_score: int = Field(..., ge=0, le=100)
+    risk_score: int = Field(..., ge=0, le=100)
     readability: int = Field(..., ge=0, le=100)
     security: int = Field(..., ge=0, le=100)
     performance: int = Field(..., ge=0, le=100)
     architecture: int = Field(..., ge=0, le=100)
 
     reasoning: str | None = None
-    rank: int | None = None
 
     created_at: datetime
     updated_at: datetime
@@ -70,6 +71,40 @@ class PRWithScore(PRBase):
     model_config = ConfigDict(
         from_attributes=True
     )
+
+
+# ─────────────────────────────────────────────
+# Glass-facing ScoredPR
+# ─────────────────────────────────────────────
+
+class ScoredPR(BaseModel):
+    """Single PR item as expected by the Glass frontend."""
+
+    id: str  # "owner/repo#42"
+    repo: str
+    number: int
+    title: str | None = None
+    author: str | None = None
+    branch: str | None = None
+    head_sha: str | None = None
+    base_sha: str | None = None
+    html_url: str | None = None
+    status: str  # scoring | scored | error
+
+    risk_score: int | None = None
+    readability: int | None = None
+    security: int | None = None
+    performance: int | None = None
+    architecture: int | None = None
+    reasoning: str | None = None
+
+    created_at: datetime
+    updated_at: datetime
+
+
+class ActivePRsResponse(BaseModel):
+    """GET /api/prs/active response envelope."""
+    items: list[ScoredPR]
 
 
 # ─────────────────────────────────────────────
@@ -148,11 +183,12 @@ class ScorePRResponse(BaseModel):
 
 
 class SprintHealthResponse(BaseModel):
-    total_prs: int
-    scored: int
-    analyzed: int
-    health_score: int | None = None
-    forecast: str | None = None
+    sprint_name: str
+    confidence_percent: int
+    trend: str
+    burndown: dict
+    blockers: list[dict]
+    updated_at: str
 
 
 class PROverviewResponse(BaseModel):

@@ -30,9 +30,10 @@ class PR(Base):
     branch = Column(String)
     head_sha = Column(String)
     base_sha = Column(String)
+    html_url = Column(String)
     diff_text = Column(Text)
 
-    status = Column(String, nullable=False, default="pending")
+    status = Column(String, nullable=False, default="scoring")
 
     created_at = Column(
         DateTime(timezone=True),
@@ -69,14 +70,13 @@ class PriorityScore(Base):
         primary_key=True,
     )
 
-    overall_score = Column(Integer, nullable=False)
+    risk_score = Column(Integer, nullable=False)
     readability = Column(Integer, nullable=False)
     security = Column(Integer, nullable=False)
     performance = Column(Integer, nullable=False)
     architecture = Column(Integer, nullable=False)
 
     reasoning = Column(Text)
-    rank = Column(Integer)
 
     created_at = Column(
         DateTime(timezone=True),
@@ -96,8 +96,8 @@ class PriorityScore(Base):
 
     __table_args__ = (
         CheckConstraint(
-            "overall_score BETWEEN 0 AND 100",
-            name="ck_priority_overall_score",
+            "risk_score BETWEEN 0 AND 100",
+            name="ck_priority_risk_score",
         ),
         CheckConstraint(
             "readability BETWEEN 0 AND 100",

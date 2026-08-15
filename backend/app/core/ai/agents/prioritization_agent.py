@@ -10,9 +10,12 @@ from app.core.ai.llm.llm_client import LLMClient
 
 
 class PriorityScoreResult(BaseModel):
-    """Validated output produced by the prioritization agent."""
+    """Validated output produced by the prioritization agent.
 
-    overall_score: int = Field(..., ge=0, le=100)
+    Matches docs/04-api-contracts/schemas/priority-score-output.schema.json
+    """
+
+    risk_score: int = Field(..., ge=0, le=100)
     readability: int = Field(..., ge=0, le=100)
     security: int = Field(..., ge=0, le=100)
     performance: int = Field(..., ge=0, le=100)
@@ -29,7 +32,6 @@ class PrioritizationAgent:
     def _extract_json(self, raw: str) -> str:
         """Strip markdown fences and extract the inner JSON string."""
         raw = raw.strip()
-        # Match ```json ... ``` or ``` ... ```
         match = re.search(r"```(?:json)?\s*(.*?)```", raw, re.DOTALL)
         if match:
             return match.group(1).strip()
@@ -48,17 +50,18 @@ You are a software engineering PR prioritization agent.
 
 Analyze the pull request and score it from 0 to 100 in these categories:
 
+- risk_score (overall priority / risk)
 - readability
 - security
 - performance
 - architecture
 
-Then calculate an overall priority score.
+Then provide a concise reasoning string.
 
 Return ONLY valid JSON with this structure:
 
 {
-  "overall_score": 0,
+  "risk_score": 0,
   "readability": 0,
   "security": 0,
   "performance": 0,

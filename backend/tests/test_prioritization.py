@@ -6,6 +6,7 @@ import pytest
 from sqlalchemy import select
 
 from app.common.models import PR, PriorityScore
+from app.core.ai.agents.prioritization_agent import PriorityScoreResult
 from app.core.prioritization.service import score_pr
 
 
@@ -27,7 +28,7 @@ async def test_score_pr_persists_priority_score():
             branch="feature/auth",
             head_sha="abc123",
             base_sha="def456",
-            status="pending",
+            status="scoring",
         )
 
         db.add(pr)
@@ -36,29 +37,21 @@ async def test_score_pr_persists_priority_score():
 
         pr_id = pr.id
 
-    fake_result = type(
-        "FakePriorityResult",
-        (),
-        {
-            "overall_score": 87,
-            "readability": 90,
-            "security": 85,
-            "performance": 80,
-            "architecture": 92,
-            "reasoning": "The PR improves authentication architecture.",
-            "rank": 1,
-        },
-    )()
+    # Use the real PriorityScoreResult model — no fake rank attribute
+    fake_result = PriorityScoreResult(
+        risk_score=87,
+        readability=90,
+        security=85,
+        performance=80,
+        architecture=92,
+        reasoning="The PR improves authentication architecture.",
+    )
 
     with patch(
         "app.core.prioritization.service.AIOrchestrator"
     ) as MockOrchestrator:
-
         orchestrator = MockOrchestrator.return_value
-
-        orchestrator.prioritize_pr = AsyncMock(
-            return_value=fake_result
-        )
+        orchestrator.prioritize_pr = AsyncMock(return_value=fake_result)
 
         await score_pr(pr_id)
 
@@ -70,28 +63,20 @@ async def test_score_pr_persists_priority_score():
         result = await db.execute(
             select(PR).where(PR.id == pr_id)
         )
-
         pr = result.scalar_one()
 
         result = await db.execute(
-            select(PriorityScore).where(
-                PriorityScore.pr_id == pr_id
-            )
+            select(PriorityScore).where(PriorityScore.pr_id == pr_id)
         )
-
         score = result.scalar_one()
 
         assert pr.status == "scored"
-
-        assert score.overall_score == 87
+        assert score.risk_score == 87
         assert score.readability == 90
         assert score.security == 85
         assert score.performance == 80
         assert score.architecture == 92
-        assert score.reasoning == (
-            "The PR improves authentication architecture."
-        )
-        assert score.rank == 1
+        assert score.reasoning == "The PR improves authentication architecture."
 
 
 @pytest.mark.asyncio
@@ -108,7 +93,7 @@ async def test_score_pr_handles_llm_failure():
             repo="owner/repo",
             number=2,
             title="Test failure",
-            status="pending",
+            status="scoring",
         )
 
         db.add(pr)
@@ -120,9 +105,7 @@ async def test_score_pr_handles_llm_failure():
     with patch(
         "app.core.prioritization.service.AIOrchestrator"
     ) as MockOrchestrator:
-
         orchestrator = MockOrchestrator.return_value
-
         orchestrator.prioritize_pr = AsyncMock(
             side_effect=Exception("LLM unavailable")
         )
@@ -137,7 +120,6 @@ async def test_score_pr_handles_llm_failure():
         result = await db.execute(
             select(PR).where(PR.id == pr_id)
         )
-
         pr = result.scalar_one()
 
         assert pr.status == "error"
@@ -152,7 +134,5 @@ async def test_score_pr_missing_pr():
     with patch(
         "app.core.prioritization.service.AIOrchestrator"
     ) as MockOrchestrator:
-
         await score_pr(nonexistent_id)
-
         MockOrchestrator.assert_not_called()

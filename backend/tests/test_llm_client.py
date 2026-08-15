@@ -42,7 +42,7 @@ async def test_generate_success(client):
     assert result == "Hello world"
     mock_http.post.assert_called_once()
     args, kwargs = mock_http.post.call_args
-    assert "key=test-key" in args[0]  # URL is the first positional argument
+    assert "key=test-key" in args[0]
     assert kwargs["json"]["systemInstruction"]["parts"][0]["text"] == "system prompt"
     assert kwargs["json"]["contents"][0]["parts"][0]["text"] == "user prompt"
     assert kwargs["json"]["generationConfig"]["temperature"] == 0.0

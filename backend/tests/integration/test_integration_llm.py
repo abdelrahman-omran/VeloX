@@ -29,7 +29,7 @@ async def test_real_gemini_prioritization():
         diff_text="+def authenticate(token):\n+    ...",
     )
 
-    assert 0 <= result.overall_score <= 100
+    assert 0 <= result.risk_score <= 100
     assert 0 <= result.readability <= 100
     assert 0 <= result.security <= 100
     assert 0 <= result.performance <= 100
