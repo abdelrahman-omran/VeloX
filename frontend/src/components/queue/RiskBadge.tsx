@@ -2,7 +2,7 @@ import { deriveRiskLevel, riskColorVar, riskLabel, type UiRiskLevel } from '../.
 import type { ScoredPr } from '../../schemas';
 
 type RiskBadgeProps = {
-  pr?: Pick<ScoredPr, 'risk_level' | 'risk_score' | 'status'>;
+  pr?: Pick<ScoredPr, 'risk_score' | 'status'>;
   level?: UiRiskLevel;
   className?: string;
 };

@@ -4,8 +4,6 @@ import { EmptyState } from '../ui/EmptyState';
 import { Skeleton } from '../ui/Skeleton';
 import { RiskBadge } from '../queue/RiskBadge';
 import { AiSummary } from './AiSummary';
-import { BlastRadiusList } from './BlastRadiusList';
-import { ReviewerAssign } from './ReviewerAssign';
 
 type PrDetailProps = {
   pr: ScoredPr | null;
@@ -30,7 +28,7 @@ export function PrDetail({ pr, isLoading, showSkeleton }: PrDetailProps) {
     return (
       <EmptyState
         headline="Select a pull request"
-        description="Pick an item from the priority queue to see AI summary, blast radius, and recommended reviewers."
+        description="Pick an item from the priority queue to see the AI summary and risk score."
       />
     );
   }
@@ -41,23 +39,18 @@ export function PrDetail({ pr, isLoading, showSkeleton }: PrDetailProps) {
         <div className="flex flex-wrap items-center gap-2">
           <span className="font-mono text-sm text-velox-muted">#{pr.number}</span>
           <RiskBadge pr={pr} />
-          {pr.ci_status ? (
-            <span className="rounded border border-velox-border px-2 py-0.5 font-mono text-[11px] text-velox-muted">
-              CI: {pr.ci_status}
-            </span>
-          ) : null}
         </div>
         <h2 className="text-2xl font-bold text-velox-text">{pr.title}</h2>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-velox-muted">
           <span>
             by <span className="font-mono text-velox-text">@{pr.author}</span>
           </span>
-          {pr.repo_full_name ? (
-            <span className="font-mono text-xs">{pr.repo_full_name}</span>
+          {pr.repo ? (
+            <span className="font-mono text-xs">{pr.repo}</span>
           ) : null}
           <span className="font-mono text-xs">{formatRelativeTime(pr.updated_at)}</span>
           <a
-            href={pr.html_url}
+            href={pr.html_url ?? '#'}
             target="_blank"
             rel="noreferrer"
             className="text-velox-brand hover:text-velox-hover"
@@ -68,13 +61,7 @@ export function PrDetail({ pr, isLoading, showSkeleton }: PrDetailProps) {
       </header>
 
       <div className="flex flex-col gap-4">
-        <AiSummary summary={pr.ai_summary} status={pr.status} />
-        <BlastRadiusList services={pr.blast_radius_services} />
-        <ReviewerAssign
-          reviewers={pr.recommended_reviewers}
-          prNumber={pr.number}
-          disabled={pr.status !== 'scored'}
-        />
+        <AiSummary summary={pr.ai_summary ?? null} status={pr.status} />
       </div>
     </article>
   );
