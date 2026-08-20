@@ -50,7 +50,7 @@ async def test_list_active_prs(client):
         assert "security" in item
         assert "performance" in item
         assert "architecture" in item
-        assert "reasoning" in item
+        assert "ai_summary" in item
         assert "html_url" in item
         assert item["status"] in ("scoring", "scored", "error")
 

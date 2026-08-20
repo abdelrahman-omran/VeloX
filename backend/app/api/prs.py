@@ -45,9 +45,6 @@ async def list_active_prs(
                 number=pr.number,
                 title=pr.title,
                 author=pr.author,
-                branch=pr.branch,
-                head_sha=pr.head_sha,
-                base_sha=pr.base_sha,
                 html_url=pr.html_url,
                 status=pr.status,
                 risk_score=score.risk_score if score else None,
@@ -55,8 +52,7 @@ async def list_active_prs(
                 security=score.security if score else None,
                 performance=score.performance if score else None,
                 architecture=score.architecture if score else None,
-                reasoning=score.reasoning if score else None,
-                created_at=pr.created_at,
+                ai_summary=score.reasoning if score else None,
                 updated_at=pr.updated_at,
             )
         )

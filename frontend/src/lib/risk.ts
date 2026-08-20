@@ -3,17 +3,13 @@ import type { RiskLevel, ScoredPr } from '../schemas';
 /** Brand has three risk colors; map critical → high, unknown → medium wash. */
 export type UiRiskLevel = 'low' | 'medium' | 'high' | 'unknown';
 
-export function deriveRiskLevel(pr: Pick<ScoredPr, 'risk_level' | 'risk_score' | 'status'>): UiRiskLevel {
-  if (pr.status === 'scoring') return 'unknown';
-  if (pr.risk_level === 'critical' || pr.risk_level === 'high') return 'high';
-  if (pr.risk_level === 'medium') return 'medium';
-  if (pr.risk_level === 'low') return 'low';
-  if (pr.risk_level === 'unknown') return 'unknown';
+export function deriveRiskLevel(pr: Pick<ScoredPr, 'risk_score' | 'status'>): UiRiskLevel {
+  if (pr.status === 'scoring' || pr.status === 'error') return 'unknown';
 
   const score = pr.risk_score;
   if (score == null) return 'unknown';
-  if (score >= 8) return 'high';
-  if (score >= 5) return 'medium';
+  if (score >= 80) return 'high'; // Adjusted mapping logic scaled assuming 0-100 max per the schema
+  if (score >= 50) return 'medium';
   return 'low';
 }
 

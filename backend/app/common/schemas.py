@@ -81,13 +81,10 @@ class ScoredPR(BaseModel):
     """Single PR item as expected by the Glass frontend."""
 
     id: str  # "owner/repo#42"
-    repo: str
+    repo: str | None = None
     number: int
     title: str | None = None
     author: str | None = None
-    branch: str | None = None
-    head_sha: str | None = None
-    base_sha: str | None = None
     html_url: str | None = None
     status: str  # scoring | scored | error
 
@@ -96,9 +93,8 @@ class ScoredPR(BaseModel):
     security: int | None = None
     performance: int | None = None
     architecture: int | None = None
-    reasoning: str | None = None
+    ai_summary: str | None = None
 
-    created_at: datetime
     updated_at: datetime
 
 

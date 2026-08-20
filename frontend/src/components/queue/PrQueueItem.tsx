@@ -11,7 +11,6 @@ type PrQueueItemProps = {
 
 export function PrQueueItem({ pr, selected, isNew, onSelect }: PrQueueItemProps) {
   const level = deriveRiskLevel(pr);
-  const blastCount = pr.blast_radius_services.length;
 
   return (
     <li>
@@ -39,9 +38,8 @@ export function PrQueueItem({ pr, selected, isNew, onSelect }: PrQueueItemProps)
             </div>
             <p className="mt-1 truncate text-sm font-medium text-velox-text">{pr.title}</p>
             <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11px] text-velox-muted">
-              <span>@{pr.author}</span>
-              {blastCount > 0 ? <span>Blast: {blastCount} svc</span> : null}
-              {pr.risk_score != null ? <span>Score: {pr.risk_score}/10</span> : null}
+              {pr.author ? <span>@{pr.author}</span> : null}
+              {pr.risk_score != null ? <span>Score: {pr.risk_score}/100</span> : null}
               <span>{formatRelativeTime(pr.updated_at)}</span>
             </div>
           </div>

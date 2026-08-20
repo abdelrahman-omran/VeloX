@@ -6,22 +6,20 @@ export type RiskLevel = z.infer<typeof RiskLevelSchema>;
 export const PrStatusSchema = z.enum(['scoring', 'scored', 'error']);
 export type PrStatus = z.infer<typeof PrStatusSchema>;
 
-export const CiStatusSchema = z.enum(['pending', 'success', 'failure', 'unknown']);
-
 export const ScoredPrSchema = z.object({
   id: z.string().min(1),
+  repo: z.string().optional(),
   number: z.number().int().min(1),
-  title: z.string().min(1),
-  author: z.string().min(1),
-  html_url: z.string().url(),
-  repo_full_name: z.string().optional(),
+  title: z.string().nullable().optional(),
+  author: z.string().nullable().optional(),
+  html_url: z.string().url().nullable().optional(),
   status: PrStatusSchema,
-  risk_score: z.number().int().min(1).max(10).nullable(),
-  risk_level: RiskLevelSchema.optional(),
-  blast_radius_services: z.array(z.string()),
+  risk_score: z.number().int().min(0).max(100).nullable(),
+  readability: z.number().int().min(0).max(100).nullable().optional(),
+  security: z.number().int().min(0).max(100).nullable().optional(),
+  performance: z.number().int().min(0).max(100).nullable().optional(),
+  architecture: z.number().int().min(0).max(100).nullable().optional(),
   ai_summary: z.string().nullable(),
-  recommended_reviewers: z.array(z.string()),
-  ci_status: CiStatusSchema.optional(),
   updated_at: z.string().datetime({ offset: true }),
 });
 
