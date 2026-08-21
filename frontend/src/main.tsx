@@ -24,6 +24,11 @@ const queryClient = new QueryClient({
   },
 });
 
+// 1. Import your Jira Analysis component at the top
+import { JiraAnalysisPage } from './pages/JiraAnalysisPage'; // Adjust the import path as needed
+
+// ... other imports ...
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
@@ -37,6 +42,9 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/connect" element={<ConnectPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/prs/:id" element={<TriagePage />} />
+            
+            <Route path="/jira-analysis" element={<JiraAnalysisPage />} />
+            
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </BrowserRouter>

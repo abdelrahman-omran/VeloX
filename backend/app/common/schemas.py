@@ -210,3 +210,30 @@ class ImpactGraphResponse(BaseModel):
     pr_id: int
     nodes: list[GraphNode]
     edges: list[GraphEdge]
+
+
+# ─────────────────────────────────────────────
+# Jira Integration Schemas
+# ─────────────────────────────────────────────
+
+class JiraIssue(BaseModel):
+    id: str
+    key: str
+    summary: str
+    status: str
+    assignee: str | None = None
+    story_points: float | None = None
+
+
+class JiraSprint(BaseModel):
+    id: int
+    name: str
+    state: str
+    start_date: str | None = None
+    end_date: str | None = None
+    goal: str | None = None
+    issues: list[JiraIssue] = []
+
+
+class JiraSprintsResponse(BaseModel):
+    sprints: list[JiraSprint]

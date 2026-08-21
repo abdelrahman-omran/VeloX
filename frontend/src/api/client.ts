@@ -6,6 +6,7 @@ import {
   type ScoredPr,
   type SprintHealth,
 } from '../schemas';
+import { JiraSprintsResponseSchema, type JiraSprint } from '../schemas/jira';
 import { fixturePrs, fixtureSprintHealth } from '../fixtures/demo';
 
 const fixturesEnabled = () => import.meta.env.VITE_USE_FIXTURES !== 'false';
@@ -85,4 +86,9 @@ export async function getSprintHealth(): Promise<SprintHealth> {
   }
 
   return fetchAndParse('/api/sprint/health', SprintHealthSchema);
+}
+
+export async function getJiraSprints(): Promise<JiraSprint[]> {
+  const data = await fetchAndParse('/api/jira/sprints', JiraSprintsResponseSchema);
+  return data.sprints;
 }

@@ -11,6 +11,12 @@ class Settings(BaseSettings):
     # LLM (Gemini)
     gemini_api_key: str = ""
 
+    # Jira Integration
+    jira_domain: str = ""  # e.g., "company.atlassian.net"
+    jira_email: str = ""
+    jira_api_token: str = ""
+    jira_board_id: str = ""
+
     # Database
     database_url: str = "postgresql+asyncpg://user:pass@localhost:5432/velox"
 

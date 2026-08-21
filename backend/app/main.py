@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.database import init_db, close_db
-from app.api import webhooks, prs, dashboard
+from app.api import webhooks, prs, dashboard, jira
 
 
 @asynccontextmanager
@@ -44,6 +44,7 @@ async def http_exception_handler(request, exc):
 app.include_router(webhooks.router, prefix="/webhooks", tags=["webhooks"])
 app.include_router(prs.router, prefix="/api/prs", tags=["prs"])
 app.include_router(dashboard.router, prefix="/api", tags=["dashboard"])
+app.include_router(jira.router, prefix="/api/jira", tags=["jira"])
 
 
 @app.get("/health")
