@@ -138,10 +138,8 @@ export function TriagePage({ routePrId }: TriagePageProps = {}) {
     filtered[0]?.repo_full_name ??
     DEFAULT_FIXTURE_REPO;
 
-  const errorMessage =
-    (prsQuery.error instanceof Error && prsQuery.error.message) ||
-    (sprintQuery.error instanceof Error && sprintQuery.error.message) ||
-    null;
+  // Suppressed error banner temporarily
+  const errorMessage = null;
 
   const syncLabel =
     import.meta.env.VITE_USE_FIXTURES === 'false'
