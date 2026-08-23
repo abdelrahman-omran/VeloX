@@ -5,6 +5,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.config import settings
 from app.database import init_db, close_db
 from app.api import webhooks, prs, dashboard, jira
 
@@ -24,10 +25,10 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS for Glass (Vite dev server)
+# CORS for Glass (dev server + deployed frontend origins via CORS_ORIGINS)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=settings.cors_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
