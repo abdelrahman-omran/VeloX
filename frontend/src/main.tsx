@@ -14,6 +14,8 @@ import { NotFoundPage } from './pages/NotFoundPage';
 import { ProjectsPage } from './pages/ProjectsPage';
 import { SignupPage } from './pages/SignupPage';
 import { TriagePage } from './pages/TriagePage';
+import { ProjectAnalysisPage } from './pages/ProjectAnalysisPage';
+import { SprintDetailPage } from './pages/SprintDetailPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,11 +25,6 @@ const queryClient = new QueryClient({
     },
   },
 });
-
-// 1. Import your Jira Analysis component at the top
-import { JiraAnalysisPage } from './pages/JiraAnalysisPage'; // Adjust the import path as needed
-
-// ... other imports ...
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -43,7 +40,8 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/prs/:id" element={<TriagePage />} />
             
-            <Route path="/jira-analysis" element={<JiraAnalysisPage />} />
+            <Route path="/project-analysis" element={<ProjectAnalysisPage />} />
+            <Route path="/project-analysis/sprint/:sprintId" element={<SprintDetailPage />} />
             
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

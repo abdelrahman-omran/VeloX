@@ -87,7 +87,7 @@ export function ProjectsPage() {
                         className="min-h-9 px-3 py-1.5 text-xs border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10"
                         onClick={() => {
                           setActiveProject(project.id);
-                          void navigate('/jira-analysis');
+                          void navigate('/project-analysis');
                         }}
                       >
                         Jira analysis

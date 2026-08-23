@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { AppShell } from '../components/layout/AppShell';
 import { Alert } from '../components/ui/Alert';
 import { Button } from '../components/ui/Button';
@@ -5,14 +6,15 @@ import { Skeleton } from '../components/ui/Skeleton';
 import { useJiraSprints } from '../hooks/useJiraSprints';
 import { useProjectStore } from '../hooks/useProjectStore';
 
-export function JiraAnalysisPage() {
+export function ProjectAnalysisPage() {
+  const navigate = useNavigate();
   const { sprints, isLoading, error, refetch } = useJiraSprints();
   const { projects, activeProject, setActiveProject } = useProjectStore();
 
   return (
     <AppShell
       variant="setup"
-      centerLabel="Jira Sprint Analysis"
+      centerLabel="Project Analysis"
       projects={projects}
       activeProject={activeProject}
       onSelectProject={setActiveProject}
@@ -22,7 +24,7 @@ export function JiraAnalysisPage() {
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-velox-text">Jira Sprint Analysis</h1>
+            <h1 className="text-2xl font-bold text-velox-text">Project Analysis</h1>
             <p className="mt-1 text-sm text-velox-muted">
               Live active and future sprints synchronized from your Jira workspace.
             </p>
@@ -59,7 +61,12 @@ export function JiraAnalysisPage() {
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-velox-border bg-velox-elevated px-5 py-4">
                   <div>
                     <div className="flex items-center gap-3">
-                      <h2 className="text-lg font-bold text-velox-text">{sprint.name}</h2>
+                      <h2 
+                        onClick={() => navigate(`/project-analysis/sprint/${sprint.id}`)}
+                        className="text-lg font-bold text-velox-text cursor-pointer hover:text-emerald-400 transition-colors"
+                      >
+                        {sprint.name}
+                      </h2>
                       <span
                         className={`rounded-full px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase ${
                           sprint.state === 'active'
@@ -86,7 +93,7 @@ export function JiraAnalysisPage() {
                     <p className="text-xs italic text-velox-muted">No issues assigned to this sprint.</p>
                   ) : (
                     <ul className="divide-y divide-velox-border/50">
-                      {sprint.issues.map((issue) => (
+                      {sprint.issues.map((issue: any) => (
                         <li key={issue.id} className="flex items-center justify-between gap-4 py-2.5 text-xs">
                           <div className="flex min-w-0 items-center gap-3">
                             <span className="shrink-0 font-mono font-semibold text-emerald-400">
@@ -121,14 +128,31 @@ export function JiraAnalysisPage() {
 
         {/* Analytics & Projection Mock Section */}
         <div className="space-y-4 pt-4 border-t border-velox-border/40">
-          {/* Yellow Warning Alert */}
-          <div className="flex items-center gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 text-xs text-amber-300">
-            <span className="shrink-0 rounded border border-amber-500/30 bg-amber-500/20 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-amber-400">
-              Warning
-            </span>
-            <span>
-              According to current burndown velocity, completion is trending behind schedule and projected to <strong>exceed the sprint deadline by 3 days</strong>.
-            </span>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Yellow Warning Alert */}
+            <div className="flex items-center gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 text-xs text-amber-300">
+                <span className="shrink-0 rounded border border-amber-500/30 bg-amber-500/20 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-amber-400">
+                Warning
+                </span>
+                <span>
+                According to current burndown velocity, completion is trending behind schedule and projected to <strong>exceed the sprint deadline by 3 days</strong>.
+                </span>
+            </div>
+
+            {/* Total Technical Debt Dummy */}
+            <div className="flex flex-col justify-center rounded-lg border border-velox-border bg-velox-card p-4">
+                <div className="mb-2 flex items-center gap-2">
+                  <span className="rounded border border-amber-500/30 bg-amber-500/20 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-amber-400">
+                    Soon
+                  </span>
+                  <h3 className="text-xs font-semibold text-velox-muted uppercase tracking-wider">Total Technical Debt</h3>
+                </div>
+                <div className="flex items-end gap-2">
+                    <span className="text-2xl font-bold text-rose-400">42</span>
+                    <span className="text-sm text-velox-muted mb-1">Story Points</span>
+                </div>
+            </div>
           </div>
 
           {/* Charts Grid */}
@@ -147,9 +171,7 @@ export function JiraAnalysisPage() {
                 {/* Mock Chart Visual */}
                 <div className="relative mt-4 h-36 w-full border-b border-l border-velox-border/60 p-2">
                   <svg className="h-full w-full overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    {/* Ideal Line */}
                     <line x1="0" y1="10" x2="100" y2="90" stroke="currentColor" className="text-velox-muted/40" strokeWidth="2" strokeDasharray="4 4" />
-                    {/* Actual Velocity Line */}
                     <path d="M 0 10 L 25 25 L 50 35 L 75 68 L 100 88" fill="none" stroke="#f59e0b" strokeWidth="2.5" />
                   </svg>
                   <div className="absolute inset-x-0 -bottom-5 flex justify-between text-[10px] font-mono text-velox-muted">
@@ -175,7 +197,6 @@ export function JiraAnalysisPage() {
                 </div>
                 <p className="text-xs text-velox-muted">Milestone schedule and dependencies</p>
 
-                {/* Mock Timeline Visual */}
                 <div className="mt-5 space-y-3">
                   <div>
                     <div className="mb-1 flex justify-between font-mono text-[11px] text-velox-muted">
@@ -186,7 +207,6 @@ export function JiraAnalysisPage() {
                       <div className="h-full w-[75%] rounded-full bg-emerald-500"></div>
                     </div>
                   </div>
-
                   <div>
                     <div className="mb-1 flex justify-between font-mono text-[11px] text-velox-muted">
                       <span>Jira Integration Sync</span>
@@ -196,7 +216,6 @@ export function JiraAnalysisPage() {
                       <div className="ml-[15%] h-full w-[60%] rounded-full bg-amber-500"></div>
                     </div>
                   </div>
-
                   <div>
                     <div className="mb-1 flex justify-between font-mono text-[11px] text-velox-muted">
                       <span>PR Triage Dashboard</span>
