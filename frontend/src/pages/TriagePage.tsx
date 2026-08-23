@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { sortPrsByRisk } from '../lib/risk';
+import { deriveRiskLevel, sortPrsByRisk } from '../lib/risk';
 import { useActivePrs } from '../hooks/useActivePrs';
 import { useDelayedFlag } from '../hooks/useDelayedFlag';
 import { useProjectStore } from '../hooks/useProjectStore';
@@ -35,8 +35,8 @@ export function TriagePage({ routePrId }: TriagePageProps = {}) {
     if (!activeProject) return [];
     return sorted.filter(
       (pr) =>
-        !pr.repo_full_name ||
-        pr.repo_full_name.toLowerCase() === activeProject.full_name.toLowerCase(),
+        !pr.repo ||
+        pr.repo.toLowerCase() === activeProject.full_name.toLowerCase(),
     );
   }, [sorted, activeProject]);
 
@@ -60,7 +60,7 @@ export function TriagePage({ routePrId }: TriagePageProps = {}) {
     }
 
     const newcomers = filtered.filter(
-      (p) => !seenIdsRef.current!.has(p.id) && p.risk_level === 'high',
+      (p) => !seenIdsRef.current!.has(p.id) && deriveRiskLevel(p) === 'high',
     );
     if (newcomers.length > 0) {
       setHighlightedIds(new Set(newcomers.map((p) => p.id)));
@@ -82,9 +82,9 @@ export function TriagePage({ routePrId }: TriagePageProps = {}) {
     if (match) {
       setUnknownDeepLink(false);
       setSelectedId(match.id);
-      if (match.repo_full_name) {
+      if (match.repo) {
         const project = projects.find(
-          (p) => p.full_name.toLowerCase() === match.repo_full_name!.toLowerCase(),
+          (p) => p.full_name.toLowerCase() === match.repo!.toLowerCase(),
         );
         if (project) setActiveProject(project.id);
       }
@@ -108,7 +108,7 @@ export function TriagePage({ routePrId }: TriagePageProps = {}) {
     if (deepLinkId) return;
     if (selectedId && filtered.some((p) => p.id === selectedId)) return;
     const preferred =
-      filtered.find((p) => p.risk_level === 'high' || (p.risk_score ?? 0) >= 8) ??
+      filtered.find((p) => deriveRiskLevel(p) === 'high') ??
       filtered[0];
     setSelectedId(preferred?.id ?? null);
   }, [filtered, selectedId, deepLinkId]);
@@ -134,8 +134,8 @@ export function TriagePage({ routePrId }: TriagePageProps = {}) {
   const selected = filtered.find((p) => p.id === selectedId) ?? null;
   const repoFallback =
     activeProject?.full_name ??
-    selected?.repo_full_name ??
-    filtered[0]?.repo_full_name ??
+    selected?.repo ??
+    filtered[0]?.repo ??
     DEFAULT_FIXTURE_REPO;
 
   // Suppressed error banner temporarily
