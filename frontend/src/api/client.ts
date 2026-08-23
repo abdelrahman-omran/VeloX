@@ -10,6 +10,7 @@ import { JiraSprintsResponseSchema, type JiraSprint } from '../schemas/jira';
 import { fixturePrs, fixtureSprintHealth } from '../fixtures/demo';
 
 const fixturesEnabled = () => import.meta.env.VITE_USE_FIXTURES !== 'false';
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '';
 
 export class ApiError extends Error {
   readonly code: string;
@@ -35,7 +36,7 @@ async function fetchAndParse<T>(
   path: string,
   schema: { parse: (data: unknown) => T },
 ): Promise<T> {
-  const response = await fetch(path, {
+  const response = await fetch(`${API_BASE}${path}`, {
     headers: { Accept: 'application/json' },
   });
 
